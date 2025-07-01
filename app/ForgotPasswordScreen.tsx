@@ -32,6 +32,9 @@ export default function ForgotPasswordScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+  <Ionicons name="arrow-back" size={24} color="#2A4E62" />
+</TouchableOpacity>
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
