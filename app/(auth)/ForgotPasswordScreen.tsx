@@ -10,17 +10,21 @@ import {
   Platform,
   ScrollView,
   StatusBar,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import appLogo from "../../assets/images/appLogoNobg.png";
+import { validateEmail } from "../../utils/validation";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [touched, setTouched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const logoScale = useRef(new Animated.Value(0)).current;
-  const isDisabled = !email;
 
   useEffect(() => {
     Animated.spring(logoScale, {
@@ -30,40 +34,100 @@ export default function ForgotPasswordScreen() {
     }).start();
   }, []);
 
+  // Real-time email validation
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    
+    if (touched) {
+      const validation = validateEmail(text);
+      setEmailError(validation.isValid ? "" : validation.message);
+    }
+  };
+
+  // Handle input blur (when user leaves the field)
+  const handleEmailBlur = () => {
+    setTouched(true);
+    const validation = validateEmail(email);
+    setEmailError(validation.isValid ? "" : validation.message);
+  };
+
   const handleBackPress = () => {
     router.back();
   };
 
-  const handleSendResetLink = () => {
+  const handleSendResetLink = async () => {
+    // Validate email before sending
+    const validation = validateEmail(email);
     
-    console.log("Sending reset link to:", email);
-    
+    if (!validation.isValid) {
+      setTouched(true);
+      setEmailError(validation.message);
+      Alert.alert(
+        "Invalid Email",
+        validation.message,
+        [{ text: "OK", style: "default" }]
+      );
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log("Sending reset link to:", email);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Show success message
+      Alert.alert(
+        "Reset Link Sent",
+        `We've sent password reset instructions to ${email}. Please check your email and follow the instructions to reset your password.`,
+        [
+          {
+            text: "OK",
+            onPress: () => router.back(), // Go back to login after success
+            style: "default"
+          }
+        ]
+      );
+      
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        "Failed to send reset link. Please check your email address and try again.",
+        [{ text: "OK", style: "destructive" }]
+      );
+      console.error("Reset password error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  // Check if form is valid for button state
+  const isFormValid = validateEmail(email).isValid;
+  const isDisabled = !isFormValid || isLoading;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={handleBackPress}
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+          disabled={isLoading}
         >
           {Platform.OS === 'ios' ? (
-            
             <View style={styles.iosBackButton}>
               <Ionicons name="chevron-back" size={24} color="#007AFF" />
               <Text style={styles.iosBackText}>Login</Text>
             </View>
           ) : (
-          
             <Ionicons name="arrow-back" size={24} color="#2A4E62" />
           )}
         </TouchableOpacity>
         
         <Text style={styles.headerTitle}>Forgot Password</Text>
         
-       
         <View style={styles.headerRight} />
       </View>
 
@@ -86,16 +150,30 @@ export default function ForgotPasswordScreen() {
             Enter your email and we'll send instructions to reset it.
           </Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={email}
-            onChangeText={setEmail}
-          />
+          {/* Email Input with Validation */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[
+                styles.input,
+                emailError && touched ? styles.inputError : null
+              ]}
+              placeholder="Email"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              value={email}
+              onChangeText={handleEmailChange}
+              onBlur={handleEmailBlur}
+              editable={!isLoading}
+            />
+            {emailError && touched && (
+              <View style={styles.errorContainer}>
+                <Ionicons name="alert-circle" size={16} color="#FF3B30" />
+                <Text style={styles.errorText}>{emailError}</Text>
+              </View>
+            )}
+          </View>
 
           <TouchableOpacity
             style={[styles.button, isDisabled && styles.buttonDisabled]}
@@ -103,7 +181,13 @@ export default function ForgotPasswordScreen() {
             onPress={handleSendResetLink}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>Send Reset Link</Text>
+            {isLoading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.buttonText}>Sending...</Text>
+              </View>
+            ) : (
+              <Text style={styles.buttonText}>Send Reset Link</Text>
+            )}
           </TouchableOpacity>
 
           
@@ -126,12 +210,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: Platform.OS === 'ios' ? 8 : 12, // Reduced iOS padding
+    paddingVertical: Platform.OS === 'ios' ? 8 : 12,
     backgroundColor: "#FCFCFC",
     borderBottomWidth: Platform.OS === 'android' ? StyleSheet.hairlineWidth : 0,
     borderBottomColor: '#E0E0E0',
-    minHeight: Platform.OS === 'ios' ? 44 : 56, // Standard header heights
-    marginTop: Platform.OS === 'ios' ? -50 : 0, // Move iOS header up
+    minHeight: Platform.OS === 'ios' ? 44 : 56,
+    marginTop: Platform.OS === 'ios' ? -50 : 0,
   },
   backButton: {
     padding: 4,
@@ -152,7 +236,7 @@ const styles = StyleSheet.create({
     fontWeight: Platform.OS === 'ios' ? '600' : 'bold',
     color: '#000',
     textAlign: 'center',
-    flex: 1, // Take remaining space for better centering
+    flex: 1,
   },
   headerRight: {
     minWidth: 60,
@@ -185,13 +269,16 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     paddingHorizontal: 10,
   },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
   input: {
     width: "100%",
     height: 50,
     backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 16,
-    marginBottom: 20,
     borderWidth: 1,
     borderColor: "#ddd",
     fontSize: 16,
@@ -203,6 +290,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
+  },
+  inputError: {
+    borderColor: "#FF3B30",
+    borderWidth: 1.5,
+  },
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+    paddingHorizontal: 4,
+  },
+  errorText: {
+    color: "#FF3B30",
+    fontSize: 12,
+    marginLeft: 4,
+    flex: 1,
   },
   button: {
     width: "100%",
@@ -231,6 +334,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  loadingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   backToLoginButton: {
     paddingVertical: 12,
     paddingHorizontal: 20,
@@ -239,5 +346,8 @@ const styles = StyleSheet.create({
     color: "#2A4E62",
     fontSize: 16,
     textAlign: "center",
+  },
+  disabledText: {
+    color: "#B0B0B0",
   },
 });

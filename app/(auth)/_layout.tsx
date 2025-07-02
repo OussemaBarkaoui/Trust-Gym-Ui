@@ -5,7 +5,7 @@ export default function AuthLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false, // We're using custom headers
+        headerShown: false,
         animation: Platform.OS === 'ios' ? 'slide_from_right' : 'fade',
         animationDuration: 250,
       }}
