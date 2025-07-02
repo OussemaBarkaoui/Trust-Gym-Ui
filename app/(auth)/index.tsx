@@ -1,24 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
   Animated,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  
 } from "react-native";
+import appLogo from "../../assets/images/appLogoNobg.png";
 import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import appLogo from "../assets/images/appLogoNobg.png";
 
-export default function ForgotPasswordScreen() {
+export default function LoginScreen() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
+  const isDisabled = !email || !password;
+
+  // Animation value
   const logoScale = useRef(new Animated.Value(0)).current;
-  const isDisabled = !email;
   useEffect(() => {
     Animated.spring(logoScale, {
       toValue: 1,
@@ -32,60 +36,59 @@ export default function ForgotPasswordScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-  <Ionicons name="arrow-back" size={24} color="#2A4E62" />
-</TouchableOpacity>
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#2A4E62" />
-        </TouchableOpacity>
-
         <Animated.Image
           style={[styles.image, { transform: [{ scale: logoScale }] }]}
           source={appLogo}
         />
 
-        <Text style={styles.title}>Forgot your password?</Text>
-        <Text style={styles.subtitle}>
-          Enter your email and we’ll send instructions to reset it.
-        </Text>
+        <Text style={styles.title}>Welcome Back</Text>
 
         <TextInput
-          style={styles.input}
+          style={
+            styles.input
+          }
           placeholder="Email"
           placeholderTextColor="#999"
           keyboardType="email-address"
+          underlineColorAndroid="transparent"
           value={email}
           onChangeText={setEmail}
         />
+
+        <TextInput
+          style={
+            styles.input
+          }
+          placeholder="Password"
+          placeholderTextColor="#999"
+          secureTextEntry
+          underlineColorAndroid="transparent"
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        <TouchableOpacity
+          style={styles.forgotButton}
+          onPress={() => router.push("/ForgotPasswordScreen")}
+        >
+          <Text style={styles.forgotText}>Forgot password?</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, isDisabled && styles.buttonDisabled]}
           disabled={isDisabled}
         >
-          <Text style={styles.buttonText}>Send Reset Link</Text>
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
 const styles = StyleSheet.create({
-  image: {
-    height: 150,
-    width: 200,
-    marginBottom: 20,
-    resizeMode: "contain",
-  },
-  buttonDisabled: {
-    backgroundColor: "#B0B0B0",
-  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -93,27 +96,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#FCFCFC",
     paddingHorizontal: 20,
   },
-  backButton: {
-    position: "absolute",
-    top: 50,
-    left: 20,
+  image: {
+    height: 200,
+    width: 350,
+    marginBottom: 20,
+    resizeMode: "contain",
+  },
+  buttonDisabled: {
+    backgroundColor: "#B0B0B0",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
-    color: "#333",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
     marginBottom: 20,
+    color: "#000000",
   },
   input: {
     width: "100%",
     height: 50,
-    backgroundColor: "#FFFFFF",
     borderRadius: 8,
     paddingHorizontal: 16,
     marginBottom: 12,
@@ -121,10 +121,18 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     fontSize: 18,
   },
+  forgotButton: {
+    alignSelf: "flex-end",
+    marginBottom: 12,
+  },
+  forgotText: {
+    color: "#2A4E62",
+    fontSize: 14,
+  },
   button: {
     width: "100%",
     height: 50,
-    backgroundColor: "#2A4E62",
+    backgroundColor: "#015ACD",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
