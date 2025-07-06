@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import appLogo from "../../assets/images/appLogoNobg.png";
 import { validateEmail } from "../../utils/validation";
+import { forgotPassword } from "@/features/(auth)/api";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -73,7 +74,7 @@ export default function ForgotPasswordScreen() {
     setIsLoading(true);
 
     try {
-      console.log("Sending reset link to:", email);
+     await forgotPassword(email);
       
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -85,7 +86,7 @@ export default function ForgotPasswordScreen() {
         [
           {
             text: "OK",
-            onPress: () => router.back(), // Go back to login after success
+            onPress: () => router.push('/OtpVerification'),
             style: "default"
           }
         ]

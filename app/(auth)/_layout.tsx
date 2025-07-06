@@ -11,7 +11,7 @@ export default function AuthLayout() {
       }}
     >
       <Stack.Screen 
-        name="index" 
+        name="LoginScreen" 
         options={{
           title: "Login",
         }} 
