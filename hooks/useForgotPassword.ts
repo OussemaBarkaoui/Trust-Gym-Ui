@@ -12,5 +12,5 @@ export function useOtpVerificationForm() {
       throw e;
     }
   };
-  return { error};
+  return { error, forgotPassword };
 }

@@ -1,23 +1,22 @@
+import { forgotPassword } from "@/features/(auth)/api";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
+  Alert,
   Animated,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StatusBar,
-  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
 import appLogo from "../../assets/images/appLogoNobg.png";
-import { validateEmail } from "../../utils/validation";
-import { forgotPassword } from "@/features/(auth)/api";
+import { forgotPasswordSchema } from "../../utils/validation";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
@@ -35,21 +34,28 @@ export default function ForgotPasswordScreen() {
     }).start();
   }, []);
 
-  // Real-time email validation
-  const handleEmailChange = (text: string) => {
+  // Real-time email validation using Yup
+  const handleEmailChange = async (text: string) => {
     setEmail(text);
-    
     if (touched) {
-      const validation = validateEmail(text);
-      setEmailError(validation.isValid ? "" : validation.message);
+      try {
+        await forgotPasswordSchema.validate({ email: text });
+        setEmailError("");
+      } catch (err: any) {
+        setEmailError(err.message);
+      }
     }
   };
 
   // Handle input blur (when user leaves the field)
-  const handleEmailBlur = () => {
+  const handleEmailBlur = async () => {
     setTouched(true);
-    const validation = validateEmail(email);
-    setEmailError(validation.isValid ? "" : validation.message);
+    try {
+      await forgotPasswordSchema.validate({ email });
+      setEmailError("");
+    } catch (err: any) {
+      setEmailError(err.message);
+    }
   };
 
   const handleBackPress = () => {
@@ -58,40 +64,23 @@ export default function ForgotPasswordScreen() {
 
   const handleSendResetLink = async () => {
     // Validate email before sending
-    const validation = validateEmail(email);
-    
-    if (!validation.isValid) {
+    try {
+      await forgotPasswordSchema.validate({ email });
+      setEmailError("");
+    } catch (err: any) {
       setTouched(true);
-      setEmailError(validation.message);
-      Alert.alert(
-        "Invalid Email",
-        validation.message,
-        [{ text: "OK", style: "default" }]
-      );
+      setEmailError(err.message);
+      Alert.alert("Invalid Email", err.message, [
+        { text: "OK", style: "default" },
+      ]);
       return;
     }
 
     setIsLoading(true);
 
     try {
-     await forgotPassword(email);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Show success message
-      Alert.alert(
-        "Reset Link Sent",
-        `We've sent password reset instructions to ${email}. Please check your email and follow the instructions to reset your password.`,
-        [
-          {
-            text: "OK",
-            onPress: () => router.push('/OtpVerification'),
-            style: "default"
-          }
-        ]
-      );
-      
+      await forgotPassword(email);
+      router.push({ pathname: "/OtpVerification", params: { email } });
     } catch (error) {
       Alert.alert(
         "Error",
@@ -105,7 +94,7 @@ export default function ForgotPasswordScreen() {
   };
 
   // Check if form is valid for button state
-  const isFormValid = validateEmail(email).isValid;
+  const isFormValid = !emailError && !!email;
   const isDisabled = !isFormValid || isLoading;
 
   return (
@@ -117,7 +106,7 @@ export default function ForgotPasswordScreen() {
           hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
           disabled={isLoading}
         >
-          {Platform.OS === 'ios' ? (
+          {Platform.OS === "ios" ? (
             <View style={styles.iosBackButton}>
               <Ionicons name="chevron-back" size={24} color="#007AFF" />
               <Text style={styles.iosBackText}>Login</Text>
@@ -126,9 +115,9 @@ export default function ForgotPasswordScreen() {
             <Ionicons name="arrow-back" size={24} color="#2A4E62" />
           )}
         </TouchableOpacity>
-        
+
         <Text style={styles.headerTitle}>Forgot Password</Text>
-        
+
         <View style={styles.headerRight} />
       </View>
 
@@ -156,7 +145,7 @@ export default function ForgotPasswordScreen() {
             <TextInput
               style={[
                 styles.input,
-                emailError && touched ? styles.inputError : null
+                emailError && touched ? styles.inputError : null,
               ]}
               placeholder="Email"
               placeholderTextColor="#999"
@@ -190,14 +179,13 @@ export default function ForgotPasswordScreen() {
               <Text style={styles.buttonText}>Send Reset Link</Text>
             )}
           </TouchableOpacity>
-
-          
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
+// ...styles (unchanged)
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -207,36 +195,36 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: Platform.OS === 'ios' ? 8 : 12,
+    paddingVertical: Platform.OS === "ios" ? 8 : 12,
     backgroundColor: "#FCFCFC",
-    borderBottomWidth: Platform.OS === 'android' ? StyleSheet.hairlineWidth : 0,
-    borderBottomColor: '#E0E0E0',
-    minHeight: Platform.OS === 'ios' ? 44 : 56,
-    marginTop: Platform.OS === 'ios' ? -50 : 0,
+    borderBottomWidth: Platform.OS === "android" ? StyleSheet.hairlineWidth : 0,
+    borderBottomColor: "#E0E0E0",
+    minHeight: Platform.OS === "ios" ? 44 : 56,
+    marginTop: Platform.OS === "ios" ? -50 : 0,
   },
   backButton: {
     padding: 4,
     minWidth: 60,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   iosBackButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iosBackText: {
-    color: '#007AFF',
+    color: "#007AFF",
     fontSize: 17,
     marginLeft: 2,
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: Platform.OS === 'ios' ? '600' : 'bold',
-    color: '#000',
-    textAlign: 'center',
+    fontWeight: Platform.OS === "ios" ? "600" : "bold",
+    color: "#000",
+    textAlign: "center",
     flex: 1,
   },
   headerRight: {

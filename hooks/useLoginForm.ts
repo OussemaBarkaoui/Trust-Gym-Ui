@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { validateEmail, validatePassword } from "../utils/validation";
 import { login } from "@/features/(auth)/api";
 import { User } from "@/entities/User";
+import { loginSchema } from "../utils/validation";
 
 interface FormData {
   email: string;
@@ -21,81 +21,86 @@ interface TouchedFields {
 }
 
 export const useLoginForm = () => {
-  const [formData, setFormData] = useState<FormData>({
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<FormErrors>({
-    email: "",
-    password: "",
-  });
-  const [touched, setTouched] = useState<TouchedFields>({
-    email: false,
-    password: false,
-  });
+  const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
+  const [errors, setErrors] = useState<FormErrors>({ email: "", password: "" });
+  const [touched, setTouched] = useState<TouchedFields>({ email: false, password: false });
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
-  const updateField = useCallback(
-    (field: keyof FormData, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-
-      if (touched[field]) {
-        const validation =
-          field === "email" ? validateEmail(value) : validatePassword(value);
-        setErrors((prev) => ({
-          ...prev,
-          [field]: validation.isValid ? "" : validation.message,
-        }));
+  // Helper to validate a single field with Yup, always using the passed value set
+  const validateField = useCallback(
+    async (field: keyof FormData, value: string, updatedFormData?: FormData) => {
+      const values = updatedFormData || { ...formData, [field]: value };
+      try {
+        await loginSchema.validateAt(field, values);
+        setErrors((prev) => ({ ...prev, [field]: "" }));
+      } catch (err: any) {
+        setErrors((prev) => ({ ...prev, [field]: err.message }));
       }
     },
-    [touched]
+    [formData]
+  );
+
+  const updateField = useCallback(
+    (field: keyof FormData, value: string) => {
+      setFormData((prev) => {
+        const updated = { ...prev, [field]: value };
+        if (touched[field]) {
+          // Pass updated value to validation to avoid stale closure
+          validateField(field, value, updated);
+        }
+        return updated;
+      });
+    },
+    [touched, validateField]
   );
 
   const handleBlur = useCallback(
     (field: keyof TouchedFields) => {
       setTouched((prev) => ({ ...prev, [field]: true }));
-      const validation =
-        field === "email"
-          ? validateEmail(formData[field])
-          : validatePassword(formData[field]);
-      setErrors((prev) => ({
-        ...prev,
-        [field]: validation.isValid ? "" : validation.message,
-      }));
+      validateField(field, formData[field]);
     },
-    [formData]
+    [formData, validateField]
   );
 
-  const validateForm = useCallback((): boolean => {
-    const emailValidation = validateEmail(formData.email);
-    const passwordValidation = validatePassword(formData.password);
-
-    const newErrors: FormErrors = {
-      email: emailValidation.isValid ? "" : emailValidation.message,
-      password: passwordValidation.isValid ? "" : passwordValidation.message,
-    };
-
-    setErrors(newErrors);
-    setTouched({ email: true, password: true });
-
-    return emailValidation.isValid && passwordValidation.isValid;
-  }, [formData]);
+  const validateForm = useCallback(async (): Promise<boolean> => {
+    try {
+      await loginSchema.validate(formData, { abortEarly: false });
+      setErrors({ email: "", password: "" });
+      setTouched({ email: true, password: true });
+      return true;
+    } catch (err: any) {
+      const newErrors: FormErrors = { email: "", password: "" };
+      if (err.inner) {
+        err.inner.forEach((validationError: any) => {
+          if (validationError.path) {
+            newErrors[validationError.path as keyof FormErrors] = validationError.message;
+          }
+        });
+      }
+      setErrors(newErrors);
+      setTouched({ email: true, password: true });
+      return false;
+    }
+  }, [formData, loginSchema]);
 
   const handleLogin = useCallback(async () => {
-    if (!validateForm()) {
+    setIsLoading(true);
+    if (!(await validateForm())) {
       Alert.alert(
         "Validation Error",
         "Please fix the errors below and try again.",
         [{ text: "OK", style: "default" }]
       );
+      setIsLoading(false);
       return;
     }
 
     try {
-     await login(formData as User);
+      await login(formData as User);
 
+      // Simulate loading
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       Alert.alert("Success", "Login successful!", [
@@ -117,9 +122,9 @@ export const useLoginForm = () => {
     router.push("/ForgotPasswordScreen");
   }, [router]);
 
+  // Button is enabled if all fields are touched/valid and not empty
   const isFormValid =
-    validateEmail(formData.email).isValid &&
-    validatePassword(formData.password).isValid;
+    !errors.email && !errors.password && formData.email !== "" && formData.password !== "";
 
   return {
     formData,

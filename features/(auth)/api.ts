@@ -9,7 +9,7 @@ export const resetPassword = (email: string, otp: string, newPassword: string) =
   axios.patch(`${API_URL}/reset-password`, { email, otp, newPassword });
 
 export const forgotPassword = (email: string) =>
-  axios.post(`${API_URL}/fogot-password`, { email});
+  axios.post(`${API_URL}/forgot-password`, { email});
 
 export const login = (user:User) =>
   axios.post(`${API_URL}/login`,  user );
