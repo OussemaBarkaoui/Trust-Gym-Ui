@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Animated, StyleSheet, ImageStyle } from 'react-native';
+import appLogopng from '../../assets/images/appLogoNobg.png';
 import appLogo from '../../assets/images/appLogoNobg.png';
 
 interface LogoProps {
@@ -30,7 +31,7 @@ export const Logo: React.FC<LogoProps> = ({
         animate && { transform: [{ scale: logoScale }] },
         style,
       ]}
-      source={appLogo}
+      source={appLogopng}
     />
   );
 };

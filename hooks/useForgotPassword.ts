@@ -6,7 +6,7 @@ export function useOtpVerificationForm() {
   const forgotPassword = async (email: string) => {
     setError("");
     try {
-      await authApi.forgotPassword(email); // This should call an endpoint that just verifies OTP
+      await authApi.forgotPassword(email); 
     } catch (e: any) {
       setError(e.response?.data?.message || "Invalid OTP.");
       throw e;

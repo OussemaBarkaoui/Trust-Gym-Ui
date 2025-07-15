@@ -1,8 +1,8 @@
+import { User } from "@/entities/User";
+import { login } from "@/features/(auth)/api";
+import { useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
-import { useRouter } from "expo-router";
-import { login } from "@/features/(auth)/api";
-import { User } from "@/entities/User";
 import { loginSchema } from "../utils/validation";
 
 interface FormData {
@@ -21,16 +21,25 @@ interface TouchedFields {
 }
 
 export const useLoginForm = () => {
-  const [formData, setFormData] = useState<FormData>({ email: "", password: "" });
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+  });
   const [errors, setErrors] = useState<FormErrors>({ email: "", password: "" });
-  const [touched, setTouched] = useState<TouchedFields>({ email: false, password: false });
+  const [touched, setTouched] = useState<TouchedFields>({
+    email: false,
+    password: false,
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
-  // Helper to validate a single field with Yup, always using the passed value set
   const validateField = useCallback(
-    async (field: keyof FormData, value: string, updatedFormData?: FormData) => {
+    async (
+      field: keyof FormData,
+      value: string,
+      updatedFormData?: FormData
+    ) => {
       const values = updatedFormData || { ...formData, [field]: value };
       try {
         await loginSchema.validateAt(field, values);
@@ -47,7 +56,6 @@ export const useLoginForm = () => {
       setFormData((prev) => {
         const updated = { ...prev, [field]: value };
         if (touched[field]) {
-          // Pass updated value to validation to avoid stale closure
           validateField(field, value, updated);
         }
         return updated;
@@ -75,7 +83,8 @@ export const useLoginForm = () => {
       if (err.inner) {
         err.inner.forEach((validationError: any) => {
           if (validationError.path) {
-            newErrors[validationError.path as keyof FormErrors] = validationError.message;
+            newErrors[validationError.path as keyof FormErrors] =
+              validationError.message;
           }
         });
       }
@@ -100,12 +109,13 @@ export const useLoginForm = () => {
     try {
       await login(formData as User);
 
-      // Simulate loading
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Simulate loading with smooth transition
+      await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      Alert.alert("Success", "Login successful!", [
-        { text: "OK", style: "default" },
-      ]);
+      // Navigate to dashboard after successful login with smooth transition
+      setTimeout(() => {
+        router.replace("/(tabs)/DashBoardScreen");
+      }, 200);
     } catch (error) {
       Alert.alert(
         "Login Failed",
@@ -114,7 +124,10 @@ export const useLoginForm = () => {
       );
       console.error("Login error:", error);
     } finally {
-      setIsLoading(false);
+      // Add a small delay before stopping loading to ensure smooth transition
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 100);
     }
   }, [formData, validateForm]);
 
@@ -122,9 +135,11 @@ export const useLoginForm = () => {
     router.push("/ForgotPasswordScreen");
   }, [router]);
 
-  // Button is enabled if all fields are touched/valid and not empty
   const isFormValid =
-    !errors.email && !errors.password && formData.email !== "" && formData.password !== "";
+    !errors.email &&
+    !errors.password &&
+    formData.email !== "" &&
+    formData.password !== "";
 
   return {
     formData,

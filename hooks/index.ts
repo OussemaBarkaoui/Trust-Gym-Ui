@@ -1,1 +1,8 @@
-export { useLoginForm } from './useLoginForm';
+export {
+  useFadeIn,
+  useScaleIn,
+  useSlideIn,
+  useStaggeredAnimation,
+} from "./useAnimations";
+export { useLoginForm } from "./useLoginForm";
+export { useSubscription } from "./useSubscription";

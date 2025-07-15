@@ -1,46 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  TextInput,
   View,
   Text,
-  TextInput,
   StyleSheet,
-  Platform,
+  TouchableOpacity,
   TextInputProps,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface InputProps extends TextInputProps {
-  label?: string;
   error?: string;
   showError?: boolean;
-  containerStyle?: object;
+  secureTextEntry?: boolean;
+  showPasswordToggle?: boolean; 
 }
 
 export const Input: React.FC<InputProps> = ({
-  label,
   error,
-  showError = false,
-  containerStyle,
+  showError,
+  secureTextEntry,
+  showPasswordToggle = true,
   style,
   ...props
 }) => {
-  const hasError = error && showError;
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const hasError = showError && error;
 
   return (
-    <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <TextInput
-        style={[
-          styles.input,
-          hasError && styles.inputError,
-          style,
-        ]}
-        placeholderTextColor="#999"
-        autoCapitalize="none"
-        autoCorrect={false}
-        underlineColorAndroid="transparent"
-        {...props}
-      />
+    <View style={styles.container}>
+      <View style={[styles.inputContainer, hasError && styles.inputContainerError]}>
+        <TextInput
+          style={[styles.input, style]}
+          secureTextEntry={secureTextEntry && !isPasswordVisible}
+          {...props}
+        />
+        {secureTextEntry && showPasswordToggle && (
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            style={styles.eyeButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons
+              name={isPasswordVisible ? 'eye-off' : 'eye'}
+              size={20}
+              color="#666"
+            />
+          </TouchableOpacity>
+        )}
+      </View>
       {hasError && (
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={16} color="#FF3B30" />
@@ -54,38 +67,39 @@ export const Input: React.FC<InputProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#333',
-    marginBottom: 8,
-  },
-  input: {
-    width: '100%',
-    height: 50,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 8,
-    paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#ddd',
-    fontSize: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  inputError: {
+  inputContainerError: {
     borderColor: '#FF3B30',
     borderWidth: 1.5,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#000',
+  },
+  eyeButton: {
+    padding: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   errorContainer: {
     flexDirection: 'row',

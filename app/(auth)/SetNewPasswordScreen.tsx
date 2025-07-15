@@ -1,5 +1,5 @@
 import { useResetPasswordForm } from "@/hooks/useResetPasswordForm";
-import { Ionicons } from "@expo/vector-icons";
+import { Input } from "@/components/ui/input";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -11,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -24,6 +23,11 @@ export default function SetNewPasswordScreen() {
   const email = Array.isArray(params.email) ? params.email[0] : params.email;
   const otp = Array.isArray(params.otp) ? params.otp[0] : params.otp;
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const logoScale = useRef(new Animated.Value(0)).current;
 
@@ -53,16 +57,71 @@ export default function SetNewPasswordScreen() {
     }, [])
   );
 
-  const handleBackPress = () => {
-    // Intentionally do nothing to prevent back navigation
-    return;
+  const validatePassword = (password: string) => {
+    if (!password) {
+      return "Password is required";
+    }
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+      return "Password must contain at least one uppercase letter, one lowercase letter, and one number";
+    }
+    return "";
+  };
+
+  const validateConfirmPassword = (confirmPwd: string, originalPwd: string) => {
+    if (!confirmPwd) {
+      return "Please confirm your password";
+    }
+    if (confirmPwd !== originalPwd) {
+      return "Passwords do not match";
+    }
+    return "";
+  };
+
+  const handlePasswordChange = (text: string) => {
+    setNewPassword(text);
+    if (passwordTouched) {
+      setPasswordError(validatePassword(text));
+    }
+    
+    if (confirmPasswordTouched) {
+      setConfirmPasswordError(validateConfirmPassword(confirmPassword, text));
+    }
+  };
+
+  const handleConfirmPasswordChange = (text: string) => {
+    setConfirmPassword(text);
+    if (confirmPasswordTouched) {
+      setConfirmPasswordError(validateConfirmPassword(text, newPassword));
+    }
+  };
+
+  const handlePasswordBlur = () => {
+    setPasswordTouched(true);
+    setPasswordError(validatePassword(newPassword));
+  };
+
+  const handleConfirmPasswordBlur = () => {
+    setConfirmPasswordTouched(true);
+    setConfirmPasswordError(validateConfirmPassword(confirmPassword, newPassword));
   };
 
   const handleSubmit = async () => {
-    if (!newPassword) {
-      Alert.alert("Error", "Please enter a new password.");
+   
+    const newPasswordError = validatePassword(newPassword);
+    const confirmPasswordError = validateConfirmPassword(confirmPassword, newPassword);
+    
+    setPasswordError(newPasswordError);
+    setConfirmPasswordError(confirmPasswordError);
+    setPasswordTouched(true);
+    setConfirmPasswordTouched(true);
+
+    if (newPasswordError || confirmPasswordError) {
       return;
     }
+
     setIsLoading(true);
     try {
       console.log(
@@ -83,6 +142,8 @@ export default function SetNewPasswordScreen() {
       setIsLoading(false);
     }
   };
+
+  const isFormValid = newPassword && confirmPassword && !passwordError && !confirmPasswordError;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -106,29 +167,39 @@ export default function SetNewPasswordScreen() {
 
           <Text style={styles.title}>Set New Password</Text>
           <Text style={styles.subtitle}>Enter your new password below.</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="New Password"
-              secureTextEntry
-              value={newPassword}
-              onChangeText={setNewPassword}
-              editable={!isLoading}
-              returnKeyType="done"
-            />
-            {error ? (
-              <View style={styles.errorContainer}>
-                <Ionicons name="alert-circle" size={16} color="#FF3B30" />
-                <Text style={styles.errorText}>{error}</Text>
-              </View>
-            ) : null}
-          </View>
+          
+           <Input
+            placeholder="New Password"
+            secureTextEntry
+            value={newPassword}
+            onChangeText={handlePasswordChange}
+            onBlur={handlePasswordBlur}
+            error={passwordError}
+            showError={passwordTouched}
+            editable={!isLoading}
+            returnKeyType="next"
+            showPasswordToggle={true} 
+          />
+
+          <Input
+            placeholder="Confirm Password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={handleConfirmPasswordChange}
+            onBlur={handleConfirmPasswordBlur}
+            error={confirmPasswordError}
+            showError={confirmPasswordTouched}
+            editable={!isLoading}
+            returnKeyType="done"
+            showPasswordToggle={false} 
+          />
+
           <TouchableOpacity
             style={[
               styles.button,
-              (isLoading || !newPassword) && styles.buttonDisabled,
+              (isLoading || !isFormValid) && styles.buttonDisabled,
             ]}
-            disabled={isLoading || !newPassword}
+            disabled={isLoading || !isFormValid}
             onPress={handleSubmit}
             activeOpacity={0.8}
           >
@@ -214,32 +285,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     lineHeight: 22,
     paddingHorizontal: 10,
-  },
-  inputContainer: {
-    width: "100%",
-    marginBottom: 20,
-  },
-  input: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    fontSize: 16,
-  },
-  errorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 4,
-    paddingHorizontal: 4,
-  },
-  errorText: {
-    color: "#FF3B30",
-    fontSize: 12,
-    marginLeft: 4,
-    flex: 1,
   },
   button: {
     width: "100%",
