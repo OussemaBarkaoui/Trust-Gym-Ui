@@ -48,7 +48,6 @@ export default function OtpVerificationScreen() {
     hasSubmitted.current = true;
     setIsLoading(true);
     try {
-      console.log("Submitting OTP:", otp, "for email:", email);
       await verifyOtp(email, otp);
       router.push({
         pathname: "/SetNewPasswordScreen",
@@ -87,7 +86,6 @@ export default function OtpVerificationScreen() {
       Alert.alert("Error", "Failed to resend OTP. Please try again.", [
         { text: "OK", style: "destructive" },
       ]);
-      console.error("Resend OTP error:", error);
     } finally {
       setIsResending(false);
     }
@@ -96,7 +94,6 @@ export default function OtpVerificationScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
-        
         <Text style={styles.headerTitle}>OTP Verification</Text>
         <View style={styles.headerRight} />
       </View>

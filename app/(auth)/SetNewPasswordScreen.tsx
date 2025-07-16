@@ -1,5 +1,5 @@
-import { useResetPasswordForm } from "@/hooks/useResetPasswordForm";
 import { Input } from "@/components/ui/input";
+import { useResetPasswordForm } from "@/hooks/useResetPasswordForm";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -85,7 +85,7 @@ export default function SetNewPasswordScreen() {
     if (passwordTouched) {
       setPasswordError(validatePassword(text));
     }
-    
+
     if (confirmPasswordTouched) {
       setConfirmPasswordError(validateConfirmPassword(confirmPassword, text));
     }
@@ -105,14 +105,18 @@ export default function SetNewPasswordScreen() {
 
   const handleConfirmPasswordBlur = () => {
     setConfirmPasswordTouched(true);
-    setConfirmPasswordError(validateConfirmPassword(confirmPassword, newPassword));
+    setConfirmPasswordError(
+      validateConfirmPassword(confirmPassword, newPassword)
+    );
   };
 
   const handleSubmit = async () => {
-   
     const newPasswordError = validatePassword(newPassword);
-    const confirmPasswordError = validateConfirmPassword(confirmPassword, newPassword);
-    
+    const confirmPasswordError = validateConfirmPassword(
+      confirmPassword,
+      newPassword
+    );
+
     setPasswordError(newPasswordError);
     setConfirmPasswordError(confirmPasswordError);
     setPasswordTouched(true);
@@ -124,14 +128,6 @@ export default function SetNewPasswordScreen() {
 
     setIsLoading(true);
     try {
-      console.log(
-        "Resetting password for email:",
-        email,
-        "with OTP:",
-        otp,
-        "and new password",
-        newPassword
-      );
       await resetPassword(email, otp, newPassword);
       Alert.alert("Success", "Your password has been reset. Please log in.", [
         { text: "OK", onPress: () => router.replace("/LoginScreen") },
@@ -143,7 +139,8 @@ export default function SetNewPasswordScreen() {
     }
   };
 
-  const isFormValid = newPassword && confirmPassword && !passwordError && !confirmPasswordError;
+  const isFormValid =
+    newPassword && confirmPassword && !passwordError && !confirmPasswordError;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -167,8 +164,8 @@ export default function SetNewPasswordScreen() {
 
           <Text style={styles.title}>Set New Password</Text>
           <Text style={styles.subtitle}>Enter your new password below.</Text>
-          
-           <Input
+
+          <Input
             placeholder="New Password"
             secureTextEntry
             value={newPassword}
@@ -178,7 +175,7 @@ export default function SetNewPasswordScreen() {
             showError={passwordTouched}
             editable={!isLoading}
             returnKeyType="next"
-            showPasswordToggle={true} 
+            showPasswordToggle={true}
           />
 
           <Input
@@ -191,7 +188,7 @@ export default function SetNewPasswordScreen() {
             showError={confirmPasswordTouched}
             editable={!isLoading}
             returnKeyType="done"
-            showPasswordToggle={false} 
+            showPasswordToggle={false}
           />
 
           <TouchableOpacity

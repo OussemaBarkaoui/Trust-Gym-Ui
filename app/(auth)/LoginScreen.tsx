@@ -1,17 +1,19 @@
-import React from 'react';
+import React from "react";
 import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Logo } from '../../components/ui/Logo';
-import { Input } from '../../components/ui/input';
-import { Button } from '../../components/ui/Button';
-import { useLoginForm } from '../../hooks/useLoginForm';
+import { Button } from "../../components/ui/Button";
+import { Checkbox } from "../../components/ui/Checkbox";
+import { Logo } from "../../components/ui/Logo";
+import { Input } from "../../components/ui/input";
+import { useLoginForm } from "../../hooks/useLoginForm";
 
 export default function LoginScreen() {
   const {
@@ -20,10 +22,12 @@ export default function LoginScreen() {
     touched,
     isLoading,
     isFormValid,
+    rememberMe,
     updateField,
     handleBlur,
     handleLogin,
     handleForgotPassword,
+    toggleRememberMe,
   } = useLoginForm();
 
   const isDisabled = !isFormValid || isLoading;
@@ -32,7 +36,7 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
           contentContainerStyle={styles.container}
@@ -47,8 +51,8 @@ export default function LoginScreen() {
             placeholder="Email"
             keyboardType="email-address"
             value={formData.email}
-            onChangeText={(text) => updateField('email', text)}
-            onBlur={() => handleBlur('email')}
+            onChangeText={(text) => updateField("email", text)}
+            onBlur={() => handleBlur("email")}
             error={errors.email}
             showError={touched.email}
             editable={!isLoading}
@@ -58,22 +62,31 @@ export default function LoginScreen() {
             placeholder="Password"
             secureTextEntry
             value={formData.password}
-            onChangeText={(text) => updateField('password', text)}
-            onBlur={() => handleBlur('password')}
+            onChangeText={(text) => updateField("password", text)}
+            onBlur={() => handleBlur("password")}
             error={errors.password}
             showError={touched.password}
             editable={!isLoading}
-            
           />
 
-          <Button
-            title="Forgot password?"
-            onPress={handleForgotPassword}
-            variant="text"
-            size="small"
-            disabled={isLoading}
-            style={styles.forgotButton}
-          />
+          <View style={styles.optionsContainer}>
+            <Checkbox
+              checked={rememberMe}
+              onToggle={toggleRememberMe}
+              label="Remember me"
+              disabled={isLoading}
+              style={styles.rememberMeCheckbox}
+            />
+
+            <Button
+              title="Forgot password?"
+              onPress={handleForgotPassword}
+              variant="text"
+              size="small"
+              disabled={isLoading}
+              style={styles.forgotButton}
+            />
+          </View>
 
           <Button
             title="Login"
@@ -90,27 +103,36 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FCFCFC',
+    backgroundColor: "#FCFCFC",
   },
   flex: {
     flex: 1,
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 30,
-    color: '#000000',
-    textAlign: 'center',
+    color: "#000000",
+    textAlign: "center",
+  },
+  optionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20,
+  },
+  rememberMeCheckbox: {
+    flex: 1,
   },
   forgotButton: {
-    alignSelf: 'flex-end',
-    marginBottom: 20,
-    width: 'auto',
+    alignSelf: "flex-end",
+    width: "auto",
   },
 });

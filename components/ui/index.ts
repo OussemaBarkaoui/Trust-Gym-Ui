@@ -1,4 +1,5 @@
 export { Button } from "./Button";
+export { Checkbox } from "./Checkbox";
 export { CustomTabBar } from "./CustomTabBar";
 export { Input } from "./input";
 export { Logo } from "./Logo";

@@ -14,20 +14,24 @@ import {
   View,
 } from "react-native";
 import {
-  Logo,
   QuickActions,
   QuickStats,
   SubscriptionCard,
 } from "../../components/ui";
 import { Colors } from "../../constants/Colors";
-
-const { width } = Dimensions.get('window');
+import { useSession } from "../../contexts/SessionContext";
 import { useFadeIn, useSlideIn, useSubscription } from "../../hooks";
+import { useLogout } from "../../hooks/useLogout";
+
+const { width } = Dimensions.get("window");
 
 export default function DashBoardScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
   const headerAnim = useRef(new Animated.Value(-50)).current;
+
+  const { session } = useSession();
+  const { confirmLogout } = useLogout();
 
   const {
     subscription,
@@ -40,7 +44,6 @@ export default function DashBoardScreen() {
   } = useSubscription();
 
   useEffect(() => {
-    // Animate header entrance with reduced distance
     Animated.timing(headerAnim, {
       toValue: 0,
       duration: 400,
@@ -70,12 +73,27 @@ export default function DashBoardScreen() {
     ]);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
+  const getMotivationalMessage = () => {
+    const messages = [
+      "Ready to crush your goals?",
+      "Time to get stronger!",
+      "Your fitness journey continues",
+      "Let's make it happen!",
+      "Every workout counts",
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={Colors.white}
-      />
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
 
       {/* Header with animation */}
       <Animated.View
@@ -87,20 +105,41 @@ export default function DashBoardScreen() {
         ]}
       >
         <View style={styles.headerContent}>
-          <View style={styles.logoContainer}>
-            <Logo style={styles.headerLogo} animate={false} />
-            <Text style={styles.headerTitle}>Trust Gym</Text>
+          <View style={styles.headerTop}>
+            <View style={styles.brandContainer}>
+              <Text style={styles.headerTitle}>
+                <Text style={styles.trustText}>Trust</Text>
+                <Text style={styles.gymText}>Gym</Text>
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.profileButton}
+              activeOpacity={0.7}
+              onPress={confirmLogout}
+            >
+              <View style={styles.profileIcon}>
+                <Text style={styles.profileText}>👤</Text>
+              </View>
+              <View style={styles.notificationBadge}>
+                <Text style={styles.badgeText}>3</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.headerBottom}>
+            <View style={styles.greetingContainer}>
+              <Text style={styles.greeting}>
+                {getGreeting()}, {session.user?.firstName || "User"}!
+              </Text>
+              <Text style={styles.motivationalText}>
+                {getMotivationalMessage()}
+              </Text>
+            </View>
           </View>
         </View>
-
-        <TouchableOpacity style={styles.profileButton}>
-          <View style={styles.profileIcon}>
-            <Text style={styles.profileText}>👤</Text>
-          </View>
-        </TouchableOpacity>
       </Animated.View>
 
-      {/* Main Content Area with animation */}
       <Animated.View
         style={[
           styles.content,
@@ -113,32 +152,34 @@ export default function DashBoardScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          bounces={true}
         >
-          <Text style={styles.welcomeText}>Welcome to Trust Gym!</Text>
-          <Text style={styles.subtitleText}>
-            Your fitness journey starts here
-          </Text>
+          {/* Quick Stats */}
+          <View style={styles.section}>
+            <QuickStats
+              checkedInToday={userStats.checkedInToday}
+              workoutsThisWeek={userStats.workoutsThisWeek}
+              lastWorkout={userStats.lastWorkout}
+              onCheckIn={handleCheckIn}
+            />
+          </View>
 
           {/* Subscription Card */}
-          <SubscriptionCard
-            planName={subscription.planName}
-            status={subscription.status}
-            expiryDate={subscription.expiryDate}
-            daysRemaining={subscription.daysRemaining}
-            onRenew={handleRenewSubscription}
-            onUpgrade={handleUpgradeSubscription}
-          />
-
-          {/* Quick Stats */}
-          <QuickStats
-            checkedInToday={userStats.checkedInToday}
-            workoutsThisWeek={userStats.workoutsThisWeek}
-            lastWorkout={userStats.lastWorkout}
-            onCheckIn={handleCheckIn}
-          />
+          <View style={styles.section}>
+            <SubscriptionCard
+              planName={subscription.planName}
+              status={subscription.status}
+              expiryDate={subscription.expiryDate}
+              daysRemaining={subscription.daysRemaining}
+              onRenew={handleRenewSubscription}
+              onUpgrade={handleUpgradeSubscription}
+            />
+          </View>
 
           {/* Quick Actions */}
-          <QuickActions actions={getQuickActions()} />
+          <View style={styles.section}>
+            <QuickActions actions={getQuickActions()} />
+          </View>
         </ScrollView>
       </Animated.View>
     </SafeAreaView>
@@ -153,74 +194,129 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: Colors.white,
     paddingHorizontal: 20,
-    paddingTop: Platform.OS === 'ios' ? 10 : 20,
+    paddingTop: Platform.OS === "ios" ? 40 : 50,
     paddingBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
       },
       android: {
-        elevation: 4,
+        elevation: 8,
       },
     }),
   },
   headerContent: {
-    flex: 1,
-    gap: 4,
+    gap: 16,
   },
-  logoContainer: {
+  headerTop: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    justifyContent: "space-between",
   },
-  headerLogo: {
-    height: 28,
-    width: 28,
+  brandContainer: {
+    flex: 1,
+    justifyContent: "center",
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: Colors.text,
+    fontSize: 28,
+    fontWeight: "700",
+    letterSpacing: -0.8,
+    textAlign: "left",
   },
-  userInfo: {
-    gap: 2,
+  trustText: {
+    color: Colors.info,
   },
-  greeting: {
-    fontSize: 14,
-    color: Colors.textSubtle,
-  },
-  userName: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: Colors.text,
+  gymText: {
+    color: Colors.black,
   },
   profileButton: {
-    padding: 8,
+    position: "relative",
+    padding: 4,
   },
   profileIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: Colors.gray100,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 2,
+    borderColor: Colors.gray200,
   },
   profileText: {
-    fontSize: 18,
+    fontSize: 20,
     color: Colors.gray600,
+  },
+  notificationBadge: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: Colors.error,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: Colors.white,
+  },
+  badgeText: {
+    color: Colors.white,
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  headerBottom: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+  greetingContainer: {
+    flex: 1,
+    gap: 4,
+  },
+  greeting: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: Colors.text,
+    letterSpacing: -0.3,
+  },
+  motivationalText: {
+    fontSize: 14,
+    color: Colors.textSubtle,
+    fontStyle: "italic",
+    letterSpacing: -0.1,
+  },
+  weatherContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: Colors.gray100,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  weatherIcon: {
+    fontSize: 16,
+  },
+  weatherText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: Colors.text,
   },
   content: {
     flex: 1,
+    backgroundColor: Colors.background,
   },
   scrollContent: {
-    padding: 20,
-    paddingBottom: 100, // Add extra padding for bottom tabs
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 120,
+  },
+  section: {
+    marginBottom: 24,
   },
   welcomeText: {
     fontSize: 24,

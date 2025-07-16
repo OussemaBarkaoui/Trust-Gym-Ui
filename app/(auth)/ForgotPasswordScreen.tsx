@@ -87,13 +87,11 @@ export default function ForgotPasswordScreen() {
         "Failed to send reset link. Please check your email address and try again.",
         [{ text: "OK", style: "destructive" }]
       );
-      console.error("Reset password error:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Check if form is valid for button state
   const isFormValid = !emailError && !!email;
   const isDisabled = !isFormValid || isLoading;
 

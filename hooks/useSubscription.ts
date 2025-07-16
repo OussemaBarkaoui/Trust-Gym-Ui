@@ -135,28 +135,28 @@ export const useSubscription = () => {
       title: "Book Class",
       icon: "calendar" as keyof typeof import("@expo/vector-icons").Ionicons.glyphMap,
       color: Colors.info,
-      onPress: () => console.log("Book Class pressed"),
+      onPress: () => {},
     },
     {
       id: "workout-plan",
       title: "Workout Plan",
       icon: "fitness" as keyof typeof import("@expo/vector-icons").Ionicons.glyphMap,
       color: Colors.success,
-      onPress: () => console.log("Workout Plan pressed"),
+      onPress: () => {},
     },
     {
       id: "nutrition",
       title: "Nutrition",
       icon: "nutrition" as keyof typeof import("@expo/vector-icons").Ionicons.glyphMap,
       color: Colors.warning,
-      onPress: () => console.log("Nutrition pressed"),
+      onPress: () => {},
     },
     {
       id: "trainer",
       title: "Find Trainer",
       icon: "person" as keyof typeof import("@expo/vector-icons").Ionicons.glyphMap,
       color: Colors.primary,
-      onPress: () => console.log("Find Trainer pressed"),
+      onPress: () => {},
     },
   ];
 

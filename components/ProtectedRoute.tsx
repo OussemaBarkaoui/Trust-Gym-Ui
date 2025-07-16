@@ -1,0 +1,27 @@
+import { useRouter, useSegments } from "expo-router";
+import React, { useEffect } from "react";
+import { useSession } from "../contexts/SessionContext";
+
+export default function ProtectedRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { session } = useSession();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!session.isLoading) {
+      const inAuthGroup = segments[0] === "(auth)";
+
+      if (!session.isAuthenticated && !inAuthGroup) {
+        router.replace("/LoginScreen");
+      } else if (session.isAuthenticated && inAuthGroup) {
+        router.replace("/(tabs)/DashBoardScreen");
+      }
+    }
+  }, [session.isAuthenticated, session.isLoading, segments, router]);
+
+  return <>{children}</>;
+}

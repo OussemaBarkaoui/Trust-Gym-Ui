@@ -1,8 +1,10 @@
 import { User } from "@/entities/User";
 import { login } from "@/features/(auth)/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
+import { useSession } from "../contexts/SessionContext";
 import { loginSchema } from "../utils/validation";
 
 interface FormData {
@@ -20,6 +22,9 @@ interface TouchedFields {
   password: boolean;
 }
 
+const REMEMBER_ME_KEY = "@trust_gym_remember_me";
+const SAVED_EMAIL_KEY = "@trust_gym_saved_email";
+
 export const useLoginForm = () => {
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -31,8 +36,49 @@ export const useLoginForm = () => {
     password: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const router = useRouter();
+  const {
+    login: sessionLogin,
+    getSavedEmail,
+    isRememberMeEnabled,
+  } = useSession();
+
+  useEffect(() => {
+    const loadSavedData = async () => {
+      try {
+        const savedRememberMe = await isRememberMeEnabled();
+        const savedEmail = await getSavedEmail();
+
+        if (savedRememberMe && savedEmail) {
+          setRememberMe(true);
+          setFormData((prev) => ({ ...prev, email: savedEmail }));
+        }
+      } catch (error) {}
+    };
+
+    loadSavedData();
+  }, [getSavedEmail, isRememberMeEnabled]);
+
+  const toggleRememberMe = useCallback(() => {
+    setRememberMe((prev) => !prev);
+  }, []);
+
+  const saveLoginData = useCallback(
+    async (email: string, remember: boolean) => {
+      try {
+        if (remember) {
+          await AsyncStorage.setItem(REMEMBER_ME_KEY, "true");
+          await AsyncStorage.setItem(SAVED_EMAIL_KEY, email);
+        } else {
+          await AsyncStorage.removeItem(REMEMBER_ME_KEY);
+          await AsyncStorage.removeItem(SAVED_EMAIL_KEY);
+        }
+      } catch (error) {}
+    },
+    []
+  );
 
   const validateField = useCallback(
     async (
@@ -107,29 +153,68 @@ export const useLoginForm = () => {
     }
 
     try {
-      await login(formData as User);
+      const response = await login(formData as User);
+      const apiResponse = response.data;
 
-      // Simulate loading with smooth transition
+      const loginResponse = {
+        accessToken: apiResponse.token,
+        refreshToken: apiResponse.refreshToken,
+        user: {
+          id: apiResponse.id,
+          firstName: apiResponse.firstName,
+          lastName: apiResponse.lastName,
+          email: apiResponse.email,
+          status: "ENABLED" as const,
+          role: apiResponse.role
+            ? {
+                id: apiResponse.role.id,
+                title: apiResponse.role.title,
+              }
+            : undefined,
+          partner: apiResponse.partnerId
+            ? {
+                id: apiResponse.partnerId,
+                name: "Partner",
+              }
+            : undefined,
+        },
+        expiresIn: 3600,
+      };
+
+      if (
+        !loginResponse.accessToken ||
+        !loginResponse.refreshToken ||
+        !loginResponse.user
+      ) {
+        throw new Error("Invalid login response format");
+      }
+
+      await sessionLogin(loginResponse, rememberMe);
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Navigate to dashboard after successful login with smooth transition
       setTimeout(() => {
         router.replace("/(tabs)/DashBoardScreen");
       }, 200);
-    } catch (error) {
-      Alert.alert(
-        "Login Failed",
-        "Invalid email or password. Please try again.",
-        [{ text: "OK", style: "destructive" }]
-      );
-      console.error("Login error:", error);
+    } catch (error: any) {
+      let errorMessage = "Invalid email or password. Please try again.";
+
+      if (error.response) {
+        errorMessage = error.response.data?.message || errorMessage;
+      } else if (error.message) {
+        if (error.message.includes("Invalid login response format")) {
+          errorMessage = "Server response error. Please try again.";
+        }
+      }
+
+      Alert.alert("Login Failed", errorMessage, [
+        { text: "OK", style: "destructive" },
+      ]);
     } finally {
-      // Add a small delay before stopping loading to ensure smooth transition
       setTimeout(() => {
         setIsLoading(false);
       }, 100);
     }
-  }, [formData, validateForm]);
+  }, [formData, validateForm, rememberMe, sessionLogin]);
 
   const handleForgotPassword = useCallback(() => {
     router.push("/ForgotPasswordScreen");
@@ -147,9 +232,11 @@ export const useLoginForm = () => {
     touched,
     isLoading,
     isFormValid,
+    rememberMe,
     updateField,
     handleBlur,
     handleLogin,
     handleForgotPassword,
+    toggleRememberMe,
   };
 };
