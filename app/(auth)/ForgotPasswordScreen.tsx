@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   KeyboardAvoidingView,
   Platform,
@@ -16,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import appLogo from "../../assets/images/appLogoNobg.png";
+import { showError } from "../../utils/showMessage";
 import { forgotPasswordSchema } from "../../utils/validation";
 
 export default function ForgotPasswordScreen() {
@@ -70,9 +70,7 @@ export default function ForgotPasswordScreen() {
     } catch (err: any) {
       setTouched(true);
       setEmailError(err.message);
-      Alert.alert("Invalid Email", err.message, [
-        { text: "OK", style: "default" },
-      ]);
+      showError(err.message, "Invalid Email");
       return;
     }
 
@@ -82,10 +80,8 @@ export default function ForgotPasswordScreen() {
       await forgotPassword(email);
       router.push({ pathname: "/OtpVerification", params: { email } });
     } catch (error) {
-      Alert.alert(
-        "Error",
-        "Failed to send reset link. Please check your email address and try again.",
-        [{ text: "OK", style: "destructive" }]
+      showError(
+        "Failed to send reset link. Please check your email address and try again."
       );
     } finally {
       setIsLoading(false);
@@ -183,7 +179,6 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-// ...styles (unchanged)
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -324,17 +319,5 @@ const styles = StyleSheet.create({
   loadingContainer: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  backToLoginButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-  },
-  backToLoginText: {
-    color: "#2A4E62",
-    fontSize: 16,
-    textAlign: "center",
-  },
-  disabledText: {
-    color: "#B0B0B0",
   },
 });

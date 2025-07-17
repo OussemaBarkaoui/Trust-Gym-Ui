@@ -1,9 +1,9 @@
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui";
 import { useResetPasswordForm } from "@/hooks/useResetPasswordForm";
+import { showError, showSuccess } from "@/utils/showMessage";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   BackHandler,
   KeyboardAvoidingView,
@@ -129,11 +129,14 @@ export default function SetNewPasswordScreen() {
     setIsLoading(true);
     try {
       await resetPassword(email, otp, newPassword);
-      Alert.alert("Success", "Your password has been reset. Please log in.", [
-        { text: "OK", onPress: () => router.replace("/LoginScreen") },
-      ]);
+      showSuccess("Password reset complete!");
+
+      // Navigate to login screen after a short delay
+      setTimeout(() => {
+        router.replace("/LoginScreen");
+      }, 2000);
     } catch (err: any) {
-      Alert.alert("Error", err?.message || "Failed to reset password.");
+      showError(err?.message || "Failed to reset password.");
     } finally {
       setIsLoading(false);
     }
@@ -229,20 +232,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E0E0E0",
     minHeight: Platform.OS === "ios" ? 44 : 56,
     marginTop: Platform.OS === "ios" ? -50 : 0,
-  },
-  backButton: {
-    padding: 4,
-    minWidth: 60,
-    alignItems: "flex-start",
-  },
-  iosBackButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iosBackText: {
-    color: "#007AFF",
-    fontSize: 17,
-    marginLeft: 2,
   },
   headerTitle: {
     fontSize: 17,

@@ -1,10 +1,10 @@
 import { forgotPassword } from "@/features/(auth)/api";
 import { useOtpVerificationForm } from "@/hooks/useOtpVerificationForm";
+import { showError, showSuccess } from "@/utils/showMessage";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   KeyboardAvoidingView,
   Platform,
@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import appLogo from "../../assets/images/appLogoNobg.png";
-import { OtpInput } from "../../components/ui/OtpInput";
+import { OtpInput } from "../../components/ui";
 
 export default function OtpVerificationScreen() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export default function OtpVerificationScreen() {
         params: { email, otp },
       });
     } catch (err: any) {
-      Alert.alert("Error", err?.message || "Invalid OTP.");
+      showError(err?.message || "Invalid OTP.");
     } finally {
       setIsLoading(false);
       setTimeout(() => {
@@ -76,16 +76,10 @@ export default function OtpVerificationScreen() {
     setIsResending(true);
     try {
       await forgotPassword(email);
-      Alert.alert(
-        "OTP Resent",
-        "A new OTP has been sent to your email address.",
-        [{ text: "OK", style: "default" }]
-      );
+      showSuccess("A new OTP has been sent to your email address.");
       setOtp(""); // Clear current OTP
     } catch (error) {
-      Alert.alert("Error", "Failed to resend OTP. Please try again.", [
-        { text: "OK", style: "destructive" },
-      ]);
+      showError("Failed to resend OTP. Please try again.");
     } finally {
       setIsResending(false);
     }
@@ -194,20 +188,6 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E0E0E0",
     minHeight: Platform.OS === "ios" ? 44 : 56,
     marginTop: Platform.OS === "ios" ? -50 : 0,
-  },
-  backButton: {
-    padding: 4,
-    minWidth: 60,
-    alignItems: "flex-start",
-  },
-  iosBackButton: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  iosBackText: {
-    color: "#007AFF",
-    fontSize: 17,
-    marginLeft: 2,
   },
   headerTitle: {
     fontSize: 17,

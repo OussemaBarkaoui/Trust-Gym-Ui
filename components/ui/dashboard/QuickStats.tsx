@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constants/Colors";
+import { Colors } from "../../../constants/Colors";
 
 interface QuickStatsProps {
   checkedInToday: boolean;
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.info,
     paddingVertical: 14,
     borderRadius: 12,
     gap: 8,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray100,
   },
   checkInButtonText: {
-    color: Colors.text,
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "600",
   },

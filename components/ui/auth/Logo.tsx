@@ -1,17 +1,13 @@
-import React, { useRef, useEffect } from 'react';
-import { Animated, StyleSheet, ImageStyle } from 'react-native';
-import appLogopng from '../../assets/images/appLogoNobg.png';
-import appLogo from '../../assets/images/appLogoNobg.png';
+import React, { useEffect, useRef } from "react";
+import { Animated, ImageStyle, StyleSheet } from "react-native";
+import appLogopng from "../../../assets/images/appLogoNobg.png";
 
 interface LogoProps {
   style?: ImageStyle;
   animate?: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ 
-  style, 
-  animate = true 
-}) => {
+export const Logo: React.FC<LogoProps> = ({ style, animate = true }) => {
   const logoScale = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -41,6 +37,6 @@ const styles = StyleSheet.create({
     height: 200,
     width: 350,
     marginBottom: 30,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
 });

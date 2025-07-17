@@ -3,8 +3,8 @@ import { login } from "@/features/(auth)/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Alert } from "react-native";
 import { useSession } from "../contexts/SessionContext";
+import { showError } from "../utils/showMessage";
 import { loginSchema } from "../utils/validation";
 
 interface FormData {
@@ -143,10 +143,9 @@ export const useLoginForm = () => {
   const handleLogin = useCallback(async () => {
     setIsLoading(true);
     if (!(await validateForm())) {
-      Alert.alert(
-        "Validation Error",
+      showError(
         "Please fix the errors below and try again.",
-        [{ text: "OK", style: "default" }]
+        "Validation Error"
       );
       setIsLoading(false);
       return;
@@ -206,9 +205,7 @@ export const useLoginForm = () => {
         }
       }
 
-      Alert.alert("Login Failed", errorMessage, [
-        { text: "OK", style: "destructive" },
-      ]);
+      showError(errorMessage, "Login Failed");
     } finally {
       setTimeout(() => {
         setIsLoading(false);

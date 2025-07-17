@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Animated,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -7,36 +8,47 @@ import {
   Text,
   View,
 } from "react-native";
+import { AppHeader } from "../../components/ui";
 import { Colors } from "../../constants/Colors";
+import { useFadeIn, useSlideIn } from "../../hooks";
 
 export default function TransactionsScreen() {
+  const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
+  const slideAnim = useSlideIn({ duration: 500, delay: 50 });
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor={Colors.primaryDark}
+      <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
+
+      <AppHeader
+        title="Transactions"
+        subtitle="Track your gym payments and purchases"
       />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Transactions</Text>
-      </View>
-
-      {/* Content */}
-      <ScrollView style={styles.content}>
-        <Text style={styles.welcomeText}>Transaction History</Text>
-        <Text style={styles.subtitleText}>
-          Track your gym payments and purchases
-        </Text>
-
-        {/* Empty state for now */}
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyStateText}>No transactions yet</Text>
-          <Text style={styles.emptyStateSubtext}>
-            Your transaction history will appear here
-          </Text>
-        </View>
-      </ScrollView>
+      <Animated.View
+        style={[
+          styles.content,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          },
+        ]}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          bounces={false}
+          overScrollMode="never"
+        >
+          {/* Empty state for now */}
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>No transactions yet</Text>
+            <Text style={styles.emptyStateSubtext}>
+              Your transaction history will appear here
+            </Text>
+          </View>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -46,39 +58,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    backgroundColor: Colors.primaryDark,
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    alignItems: "center",
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  headerTitle: {
-    color: Colors.white,
-    fontSize: 20,
-    fontWeight: "bold",
-  },
   content: {
     flex: 1,
-    padding: 20,
+    backgroundColor: Colors.background,
   },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: Colors.text,
-    marginBottom: 8,
-  },
-  subtitleText: {
-    fontSize: 16,
-    color: Colors.textSubtle,
-    marginBottom: 30,
+  scrollContent: {
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   emptyState: {
     flex: 1,

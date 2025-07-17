@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Colors } from "../../constants/Colors";
+import { Colors } from "../../../constants/Colors";
 
 interface SubscriptionCardProps {
   planName: string;
@@ -162,13 +162,13 @@ const styles = StyleSheet.create({
   },
   renewButton: {
     flex: 1,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.info,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
   },
   renewButtonText: {
-    color: Colors.text,
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "600",
   },
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: Colors.info,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",

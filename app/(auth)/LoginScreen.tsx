@@ -9,10 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button } from "../../components/ui/Button";
-import { Checkbox } from "../../components/ui/Checkbox";
-import { Logo } from "../../components/ui/Logo";
-import { Input } from "../../components/ui/input";
+import { Button, Checkbox, Input, Logo } from "../../components/ui";
 import { useLoginForm } from "../../hooks/useLoginForm";
 
 export default function LoginScreen() {

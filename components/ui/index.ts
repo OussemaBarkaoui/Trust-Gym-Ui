@@ -1,8 +1,12 @@
+// Shared components
 export { Button } from "./Button";
 export { Checkbox } from "./Checkbox";
 export { CustomTabBar } from "./CustomTabBar";
+export { default as AppHeader } from "./dashboard/AppHeader";
 export { Input } from "./input";
-export { Logo } from "./Logo";
-export { QuickActions } from "./QuickActions";
-export { QuickStats } from "./QuickStats";
-export { SubscriptionCard } from "./SubscriptionCard";
+
+// Dashboard components
+export * from "./dashboard";
+
+// Auth components
+export * from "./auth";
