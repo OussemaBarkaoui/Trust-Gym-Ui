@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Easing,
@@ -23,11 +24,36 @@ export default function AppHeader({
   title,
   subtitle,
   showProfileButton = true,
-  notificationCount = 3,
+  notificationCount = 0,
 }: AppHeaderProps) {
   const headerAnim = useRef(new Animated.Value(-50)).current;
   const { session } = useSession();
   const { confirmLogout } = useLogout();
+  const router = useRouter();
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (session.user?.firstName && session.user?.lastName) {
+      return `${session.user.firstName.charAt(0)}${session.user.lastName.charAt(
+        0
+      )}`.toUpperCase();
+    }
+    return "U";
+  };
+
+  const handleProfilePress = () => {
+    if (showDropdown) {
+      setShowDropdown(false);
+    } else {
+      router.push("/(tabs)/ProfileScreen");
+    }
+  };
+
+  const handleLogout = () => {
+    setShowDropdown(false);
+    confirmLogout();
+  };
 
   useEffect(() => {
     Animated.timing(headerAnim, {
@@ -57,20 +83,26 @@ export default function AppHeader({
           </View>
 
           {showProfileButton && (
-            <TouchableOpacity
-              style={styles.profileButton}
-              activeOpacity={0.7}
-              onPress={confirmLogout}
-            >
-              <View style={styles.profileIcon}>
-                <Text style={styles.profileText}>👤</Text>
-              </View>
-              {notificationCount > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.badgeText}>{notificationCount}</Text>
+            <View style={styles.profileContainer}>
+              <TouchableOpacity
+                style={styles.profileButton}
+                activeOpacity={0.7}
+                onPress={handleProfilePress}
+              >
+                <View style={styles.profileAvatar}>
+                  <Text style={styles.avatarText}>{getUserInitials()}</Text>
                 </View>
-              )}
-            </TouchableOpacity>
+                {notificationCount > 0 && (
+                  <View style={styles.notificationBadge}>
+                    <Text style={styles.badgeText}>
+                      {notificationCount > 9 ? "9+" : notificationCount}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              {/* Quick Actions */}
+            </View>
           )}
         </View>
 
@@ -131,19 +163,43 @@ const styles = StyleSheet.create({
     position: "relative",
     padding: 4,
   },
-  profileIcon: {
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  profileAvatar: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.gray100,
+    backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: Colors.gray200,
+    borderColor: Colors.white,
+    shadowColor: Colors.black,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  profileText: {
-    fontSize: 20,
-    color: Colors.gray600,
+  avatarText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: Colors.white,
+  },
+  quickAction: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.gray200,
   },
   notificationBadge: {
     position: "absolute",

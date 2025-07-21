@@ -8,7 +8,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
+        tabBarActiveTintColor: Colors.info,
         tabBarInactiveTintColor: Colors.textSubtle,
         tabBarStyle: {
           backgroundColor: Colors.surface,
@@ -58,6 +58,15 @@ export default function TabsLayout() {
           title: "Wallet",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="ProfileScreen"
+        options={{
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person" size={size} color={color} />
           ),
         }}
       />

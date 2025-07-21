@@ -125,6 +125,8 @@ export class SessionManager {
         AsyncStorage.removeItem(ACCESS_TOKEN_KEY),
         AsyncStorage.removeItem(REFRESH_TOKEN_KEY),
         AsyncStorage.removeItem(USER_PROFILE_KEY),
+        AsyncStorage.removeItem(REMEMBER_ME_KEY),
+        AsyncStorage.removeItem(SAVED_EMAIL_KEY),
       ]);
 
       this.sessionState = {

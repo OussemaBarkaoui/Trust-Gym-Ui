@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
-  TextInput,
-  View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
+  Text,
+  TextInput,
   TextInputProps,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface InputProps extends TextInputProps {
   error?: string;
   showError?: boolean;
   secureTextEntry?: boolean;
-  showPasswordToggle?: boolean; 
+  showPasswordToggle?: boolean;
+  prefix?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -21,6 +22,7 @@ export const Input: React.FC<InputProps> = ({
   showError,
   secureTextEntry,
   showPasswordToggle = true,
+  prefix,
   style,
   ...props
 }) => {
@@ -34,9 +36,12 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <View style={styles.container}>
-      <View style={[styles.inputContainer, hasError && styles.inputContainerError]}>
+      <View
+        style={[styles.inputContainer, hasError && styles.inputContainerError]}
+      >
+        {prefix && <Text style={styles.prefixText}>{prefix}</Text>}
         <TextInput
-          style={[styles.input, style]}
+          style={[styles.input, prefix && styles.inputWithPrefix, style]}
           secureTextEntry={secureTextEntry && !isPasswordVisible}
           {...props}
         />
@@ -47,7 +52,7 @@ export const Input: React.FC<InputProps> = ({
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons
-              name={isPasswordVisible ? 'eye-off' : 'eye'}
+              name={isPasswordVisible ? "eye-off" : "eye"}
               size={20}
               color="#666"
             />
@@ -66,17 +71,17 @@ export const Input: React.FC<InputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     marginBottom: 20,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
-    shadowColor: '#000',
+    borderColor: "#ddd",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 1,
@@ -86,7 +91,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   inputContainerError: {
-    borderColor: '#FF3B30',
+    borderColor: "#FF3B30",
     borderWidth: 1.5,
   },
   input: {
@@ -94,21 +99,31 @@ const styles = StyleSheet.create({
     height: 50,
     paddingHorizontal: 16,
     fontSize: 16,
-    color: '#000',
+    color: "#000",
+  },
+  inputWithPrefix: {
+    paddingLeft: 8,
+  },
+  prefixText: {
+    fontSize: 16,
+    color: "#666",
+    fontWeight: "600",
+    paddingLeft: 16,
+    paddingRight: 4,
   },
   eyeButton: {
     padding: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 4,
     paddingHorizontal: 4,
   },
   errorText: {
-    color: '#FF3B30',
+    color: "#FF3B30",
     fontSize: 12,
     marginLeft: 4,
     flex: 1,
