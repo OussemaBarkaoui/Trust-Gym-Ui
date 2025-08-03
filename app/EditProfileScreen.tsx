@@ -141,6 +141,7 @@ export default function EditProfileScreen() {
           fileName: profileImage.fileName,
         };
         const uploadedImage = await uploadImage(imageToUpload);
+        
         if (uploadedImage && uploadedImage.imageUrl) {
           updatePayload.memberImage = {
             fileName: uploadedImage.fileName,

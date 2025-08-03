@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Easing,
+  Image,
   Platform,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import {
 import { Colors } from "../../../constants/Colors";
 import { useSession } from "../../../contexts/SessionContext";
 import { useLogout } from "../../../hooks/useLogout";
+import { refreshUserProfileInSession } from "../../../features/profile/api";
 
 interface AppHeaderProps {
   title: string;
@@ -62,7 +64,16 @@ export default function AppHeader({
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
     }).start();
-  }, []);
+
+    // Refresh profile data when AppHeader mounts (for image URL)
+    const loadProfileData = async () => {
+      if (session.isAuthenticated && session.user?.id) {
+        await refreshUserProfileInSession();
+      }
+    };
+    
+    loadProfileData();
+  }, [session.isAuthenticated, session.user?.id]);
 
   return (
     <Animated.View
@@ -90,7 +101,14 @@ export default function AppHeader({
                 onPress={handleProfilePress}
               >
                 <View style={styles.profileAvatar}>
-                  <Text style={styles.avatarText}>{getUserInitials()}</Text>
+                  {session.user?.imageUrl ? (
+                    <Image 
+                      source={{ uri: session.user.imageUrl }} 
+                      style={styles.avatarImage} 
+                    />
+                  ) : (
+                    <Text style={styles.avatarText}>{getUserInitials()}</Text>
+                  )}
                 </View>
                 {notificationCount > 0 && (
                   <View style={styles.notificationBadge}>
@@ -185,6 +203,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   avatarText: {
     fontSize: 16,

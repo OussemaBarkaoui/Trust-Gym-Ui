@@ -44,15 +44,12 @@ export default function WalletScreen() {
   const fetchWalletData = useCallback(async () => {
     if (!session.user?.id) return;
 
-    console.log(`🔄 Fetching wallet data for user: ${session.user.id}`);
 
     try {
       const walletData = await getWallet(session.user.id);
-      console.log(`✅ Wallet data received in component:`, walletData);
       setWallet(walletData);
       setWalletBalance(walletData.amount);
       setHasWallet(true);
-      console.log(`✅ Set hasWallet to true, balance: ${walletData.amount}`);
     } catch (error: any) {
       console.error("❌ Failed to fetch wallet:", error);
       console.error("❌ Error message:", error.message);
@@ -63,15 +60,11 @@ export default function WalletScreen() {
         error.message.includes("does not have a wallet") ||
         error.message.includes("Member does not have a wallet")
       ) {
-        console.log(
-          "🚫 Member does not have a wallet - showing create wallet UI"
-        );
         setHasWallet(false);
         setWallet(null);
         setWalletBalance(0);
       } else {
         // Other errors - still assume wallet exists but show error
-        console.log("⚠️ Other error occurred - assuming wallet exists");
         setHasWallet(true);
         showError("Failed to load wallet information");
       }
@@ -88,12 +81,9 @@ export default function WalletScreen() {
   // Initial wallet data fetch
   useEffect(() => {
     const loadWallet = async () => {
-      console.log(`🚀 Component mounted - starting initial wallet fetch`);
-      console.log(`👤 Session user:`, session.user?.id);
       setFetchingWallet(true);
       await fetchWalletData();
       setFetchingWallet(false);
-      console.log(`🏁 Initial wallet fetch completed`);
     };
 
     loadWallet();
@@ -102,7 +92,6 @@ export default function WalletScreen() {
   // Refresh wallet data when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      console.log(`👁️ Screen focused - refreshing wallet data`);
       fetchWalletData();
     }, [fetchWalletData])
   );
@@ -110,14 +99,11 @@ export default function WalletScreen() {
   // Auto refresh wallet data every 30 seconds when screen is active
   useFocusEffect(
     useCallback(() => {
-      console.log(`⏰ Setting up auto-refresh interval`);
       const interval = setInterval(() => {
-        console.log(`🔄 Auto-refreshing wallet data...`);
         fetchWalletData();
       }, 30000); // Refresh every 30 seconds
 
       return () => {
-        console.log(`🛑 Clearing auto-refresh interval`);
         clearInterval(interval);
       };
     }, [fetchWalletData])
@@ -127,8 +113,6 @@ export default function WalletScreen() {
   const handleCreateWallet = async () => {
     if (!session.user?.id) return;
 
-    console.log(`🔄 Creating wallet for user: ${session.user.id}`);
-    console.log(`🔄 Partner ID:`, session.user.partner?.id);
 
     setCreatingWallet(true);
     try {
@@ -137,14 +121,11 @@ export default function WalletScreen() {
         0,
         session.user.partner?.id
       );
-      console.log(`✅ Wallet created successfully:`, result);
 
       showSuccess("Wallet created successfully!");
       // Refresh wallet data after creation
-      console.log(`🔄 Refreshing wallet data after creation...`);
       await fetchWalletData();
     } catch (error) {
-      console.error("❌ Failed to create wallet:", error);
       showError("Failed to create wallet. Please try again.");
     } finally {
       setCreatingWallet(false);
@@ -235,12 +216,6 @@ export default function WalletScreen() {
     },
   ];
 
-  // Debug render state
-  console.log(`🎨 RENDER DECISION:`);
-  console.log(`   - fetchingWallet: ${fetchingWallet}`);
-  console.log(`   - hasWallet: ${hasWallet}`);
-  console.log(`   - wallet: ${wallet ? "exists" : "null"}`);
-  console.log(`   - walletBalance: ${walletBalance}`);
 
   return (
     <SafeAreaView style={styles.container}>

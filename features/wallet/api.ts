@@ -30,15 +30,13 @@ export interface WalletResponse {
 
 // Get wallet information for a member
 export const getWallet = async (memberId: string): Promise<Wallet> => {
-  console.log(`🔍 Getting wallet for member: ${memberId}`);
+
 
   const response = await fetch(`${API_BASE_URL}/member/${memberId}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
 
-  console.log(`📡 Response status: ${response.status}`);
-  console.log(`📡 Response ok: ${response.ok}`);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -55,7 +53,6 @@ export const getWallet = async (memberId: string): Promise<Wallet> => {
       response.status === 400 ||
       response.status === 404
     ) {
-      console.log(`🚫 Wallet not found for member`);
       throw new Error("WALLET_NOT_FOUND");
     }
 
@@ -63,7 +60,6 @@ export const getWallet = async (memberId: string): Promise<Wallet> => {
   }
 
   const walletData = await response.json();
-  console.log(`✅ Wallet data received:`, walletData);
   return walletData;
 };
 

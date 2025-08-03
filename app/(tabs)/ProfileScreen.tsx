@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Alert,
   Animated,
+  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -17,12 +18,24 @@ import { Colors } from "../../constants/Colors";
 import { useSession } from "../../contexts/SessionContext";
 import { useFadeIn, useLogout, useSlideIn } from "../../hooks";
 import { showSuccess } from "../../utils/showMessage";
+import { refreshUserProfileInSession } from "../../features/profile/api";
 
 export default function ProfileScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
   const { session } = useSession();
   const { confirmLogout } = useLogout();
+
+  // Refresh profile data when screen loads
+  useEffect(() => {
+    const loadProfileData = async () => {
+      if (session.isAuthenticated && session.user?.id) {
+        await refreshUserProfileInSession();
+      }
+    };
+    
+    loadProfileData();
+  }, [session.isAuthenticated, session.user?.id]);
 
   const handleEditProfile = () => {
     router.push("/EditProfileScreen");
@@ -127,7 +140,14 @@ export default function ProfileScreen() {
           {/* Profile Header */}
           <View style={styles.profileHeader}>
             <View style={styles.avatarContainer}>
-              <Text style={styles.avatarText}>{getUserInitials()}</Text>
+              {session.user?.imageUrl ? (
+                <Image 
+                  source={{ uri: session.user.imageUrl }} 
+                  style={styles.avatarImage} 
+                />
+              ) : (
+                <Text style={styles.avatarText}>{getUserInitials()}</Text>
+              )}
             </View>
             <View style={styles.userInfo}>
               <Text style={styles.userName}>
@@ -220,6 +240,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   avatarText: {
     fontSize: 32,

@@ -48,22 +48,8 @@ export const uploadFile = async (file: {
   type: string;
   name: string;
 }): Promise<UploadFileResponse> => {
-  console.log('🚀 Starting file upload...');
-  console.log('📝 File details:', { uri: file.uri, type: file.type, name: file.name });
-  
   const sessionManager = SessionManager.getInstance();
   const currentSession = sessionManager.getSessionState();
-
-  // First test backend connectivity
-  console.log('🔍 Testing backend connection...');
-  try {
-    const testResponse = await fetch(`${FILES_API_BASE_URL.replace('/upload', '')}/health`, {
-      method: "GET",
-    });
-    console.log('🔍 Backend health check:', testResponse.status);
-  } catch (error) {
-    console.log('⚠️ Backend health check failed:', error);
-  }
 
   const formData = new FormData();
   
@@ -75,21 +61,7 @@ export const uploadFile = async (file: {
     name: file.name || `image_${Date.now()}.jpg`, // Generate name if missing
   };
   
-  console.log('📝 Formatted file object:', fileObject);
-  
   formData.append('file', fileObject as any);
-
-  console.log('🔍 Uploading file:', {
-    name: file.name,
-    type: file.type,
-    uri: file.uri.substring(0, 50) + '...',
-  });
-
-  console.log('🔍 Uploading file to:', `${FILES_API_BASE_URL}/upload`);
-  console.log('🔍 With headers:', {
-    hasToken: !!currentSession.accessToken,
-    tokenPreview: currentSession.accessToken?.substring(0, 20) + '...'
-  });
 
   try {
     const response = await fetch(`${FILES_API_BASE_URL}/upload`, {
@@ -103,14 +75,8 @@ export const uploadFile = async (file: {
       body: formData,
     });
 
-    console.log('📡 Upload response status:', response.status);
-
     if (!response.ok) {
-      console.error('❌ Upload failed - Status:', response.status);
-      console.error('❌ Response headers:', JSON.stringify([...response.headers.entries()]));
-      
       const errorText = await response.text();
-      console.error('❌ Response body:', errorText);
       
       let errorData;
       try {
@@ -122,15 +88,12 @@ export const uploadFile = async (file: {
       const errorMessage = 
         errorData.message || errorData.en || `Upload failed with status ${response.status}`;
       
-      console.error('❌ Final error message:', errorMessage);
       throw new Error(errorMessage);
     }
 
     const result = await response.json();
-    console.log('✅ Upload successful:', result);
     return result;
   } catch (error) {
-    console.error('❌ Upload error:', error);
     throw error;
   }
 };
@@ -157,7 +120,38 @@ export const getCurrentUserProfile = async (): Promise<UserProfile> => {
   }
 
   const result = await response.json();
-  return result;
+  
+  // Transform the backend response to match UserProfile interface
+  const userProfile: UserProfile = {
+    id: result.id,
+    firstName: result.firstName,
+    lastName: result.lastName,
+    email: result.email,
+    phone: result.phone,
+    address: result.address,
+    city: result.city,
+    profession: result.profession,
+    // Use memberImage.imageUrl if available, otherwise undefined
+    imageUrl: result.memberImage?.imageUrl || undefined,
+    status: result.status,
+    role: result.role,
+    partner: result.partner,
+    gym: result.gym,
+  };
+  
+  return userProfile;
+};
+
+// Refresh current user profile in session
+export const refreshUserProfileInSession = async (): Promise<void> => {
+  try {
+    const updatedProfile = await getCurrentUserProfile();
+    
+    const sessionManager = SessionManager.getInstance();
+    await sessionManager.updateUserProfile(updatedProfile);
+  } catch (error) {
+    console.error('Failed to refresh user profile in session:', error);
+  }
 };
 
 // Update member profile

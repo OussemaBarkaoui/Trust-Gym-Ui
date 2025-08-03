@@ -21,7 +21,6 @@ export const useWallet = (memberId: string) => {
       setLoading(true);
       const walletData = await getWallet(memberId);
       setWallet(walletData);
-      console.log("🔄 Wallet data refreshed:", walletData);
     } catch (error) {
       showError("Failed to fetch wallet information");
       console.error("Wallet fetch error:", error);
@@ -44,7 +43,7 @@ export const useWallet = (memberId: string) => {
   // Auto-refresh when screen comes into focus
   useFocusEffect(
     useCallback(() => {
-      console.log("👁️ useWallet: Screen focused - refreshing wallet");
+      
       fetchWallet();
       fetchTransactions();
     }, [fetchWallet, fetchTransactions])
@@ -54,7 +53,6 @@ export const useWallet = (memberId: string) => {
   useFocusEffect(
     useCallback(() => {
       const interval = setInterval(() => {
-        console.log("🔄 useWallet: Auto-refreshing...");
         fetchWallet();
         fetchTransactions();
       }, 30000);
