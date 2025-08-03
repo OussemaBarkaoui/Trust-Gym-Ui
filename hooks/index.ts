@@ -8,3 +8,5 @@ export { useLoginForm } from "./useLoginForm";
 export { useLogout } from "./useLogout";
 export { useSubscription } from "./useSubscription";
 export { useWallet } from "./useWallet";
+export { useEditProfile } from "./useEditProfile";
+export { useImagePicker } from "./useImagePicker";

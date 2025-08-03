@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React from "react";
 import {
   Alert,
@@ -24,7 +25,7 @@ export default function ProfileScreen() {
   const { confirmLogout } = useLogout();
 
   const handleEditProfile = () => {
-    showSuccess("Edit profile functionality coming soon!");
+    router.push("/EditProfileScreen");
   };
 
   const handleChangePassword = () => {

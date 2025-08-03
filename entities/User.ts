@@ -42,6 +42,11 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  profession?: string;
+  imageUrl?: string;
   status: Status;
   role?: {
     id: string;
