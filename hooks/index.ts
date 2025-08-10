@@ -10,3 +10,4 @@ export { useSubscription } from "./useSubscription";
 export { useWallet } from "./useWallet";
 export { useEditProfile } from "./useEditProfile";
 export { useImagePicker } from "./useImagePicker";
+export { useChangePassword } from "./useChangePassword";

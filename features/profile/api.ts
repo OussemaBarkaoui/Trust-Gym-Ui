@@ -1,8 +1,8 @@
 import { SessionManager } from "@/services/SessionManager";
 import { UserProfile } from "@/entities/User";
 
-const API_BASE_URL = "http://192.168.3.215:3000/api/member";
-const FILES_API_BASE_URL = "http://192.168.3.215:3000/api/files";
+const API_BASE_URL = "http://192.168.1.4:3000/api/member";
+const FILES_API_BASE_URL = "http://192.168.1.4:3000/api/files";
 
 // Function to get auth headers
 const getAuthHeaders = () => {
@@ -40,6 +40,15 @@ export interface UploadFileResponse {
   message: string;
   fileName: string;
   fileUrl: string;
+}
+
+export interface ChangePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  message: string;
 }
 
 // Upload file to AWS S3
@@ -168,6 +177,27 @@ export const updateMemberProfile = async (
     const errorData = await response.json().catch(() => ({}));
     const errorMessage = 
       errorData.message || errorData.en || "Failed to update profile";
+    throw new Error(errorMessage);
+  }
+
+  const result = await response.json();
+  return result;
+};
+
+// Change member password
+export const changeMemberPassword = async (
+  payload: ChangePasswordRequest
+): Promise<ChangePasswordResponse> => {
+  const response = await fetch(`${API_BASE_URL}/password/change`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const errorMessage = 
+      errorData.message || errorData.en || "Failed to change password";
     throw new Error(errorMessage);
   }
 

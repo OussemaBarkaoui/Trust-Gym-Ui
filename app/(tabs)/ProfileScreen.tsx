@@ -42,7 +42,7 @@ export default function ProfileScreen() {
   };
 
   const handleChangePassword = () => {
-    showSuccess("Change password functionality coming soon!");
+    router.push("/ChangePasswordScreen");
   };
 
   const handleNotificationSettings = () => {
