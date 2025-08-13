@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Animated,
@@ -18,13 +19,14 @@ import { Colors } from "../../constants/Colors";
 import { useSession } from "../../contexts/SessionContext";
 import { Wallet } from "../../entities/Wallet";
 import { createWallet, getWallet } from "../../features/wallet/api";
-import { useFadeIn, useSlideIn } from "../../hooks";
+import { useFadeIn, useSlideIn, useMemberPurchases } from "../../hooks";
 import { showError, showSuccess } from "../../utils/showMessage";
 
 export default function WalletScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
   const { session } = useSession();
+  const { getRecentPurchases, loading: purchasesLoading, refreshPurchases } = useMemberPurchases();
 
   // State for wallet operations
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -74,9 +76,12 @@ export default function WalletScreen() {
   // Pull to refresh handler
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await fetchWalletData();
+    await Promise.all([
+      fetchWalletData(),
+      refreshPurchases()
+    ]);
     setRefreshing(false);
-  }, [fetchWalletData]);
+  }, [fetchWalletData, refreshPurchases]);
 
   // Initial wallet data fetch
   useEffect(() => {
@@ -185,36 +190,24 @@ export default function WalletScreen() {
 
   const quickAmounts = ["25", "50", "100", "200"];
 
-  const recentTransactions = [
-    {
-      id: "1",
-      type: "deposit",
-      amount: 100,
-      date: "2024-01-15",
-      description: "Wallet Top-up",
-    },
-    {
-      id: "2",
-      type: "withdraw",
-      amount: 25,
-      date: "2024-01-14",
-      description: "Gym Purchase",
-    },
-    {
-      id: "3",
-      type: "deposit",
-      amount: 200,
-      date: "2024-01-13",
-      description: "Monthly Top-up",
-    },
-    {
-      id: "4",
-      type: "withdraw",
-      amount: 15,
-      date: "2024-01-12",
-      description: "Protein Bar",
-    },
-  ];
+  // Transform recent purchases into transaction format
+  const recentTransactions = getRecentPurchases().map((purchase) => ({
+    id: purchase.id,
+    type: "purchase" as const,
+    amount: parseFloat(purchase.total),
+    date: purchase.createdAt,
+    description: purchase.product.name,
+    isPaid: purchase.isPaid,
+    paymentMethod: purchase.paymentMethod,
+  }));
+
+  const handleViewAllTransactions = () => {
+    router.push("/AllPurchasesScreen");
+  };
+
+  const handleTransactionPress = (transactionId: string) => {
+    router.push(`/PurchaseDetailsScreen?id=${transactionId}`);
+  };
 
 
   return (
@@ -295,11 +288,12 @@ export default function WalletScreen() {
                       <Text style={styles.balanceAmount}>Loading...</Text>
                     ) : (
                       <Text style={styles.balanceAmount}>
-                        $
+                        
                         {walletBalance.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
+                        DT
                       </Text>
                     )}
                     <Text style={styles.balanceSubtext}>
@@ -340,70 +334,83 @@ export default function WalletScreen() {
               <View style={styles.transactionsSection}>
                 <View style={styles.sectionHeader}>
                   <Text style={styles.sectionTitle}>Recent Transactions</Text>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleViewAllTransactions}>
                     <Text style={styles.viewAllText}>View All</Text>
                   </TouchableOpacity>
                 </View>
 
-                {recentTransactions.map((transaction) => (
-                  <View key={transaction.id} style={styles.transactionItem}>
-                    <View
-                      style={[
-                        styles.transactionIcon,
-                        {
-                          backgroundColor:
-                            transaction.type === "deposit"
-                              ? Colors.success + "20"
-                              : Colors.error + "20",
-                        },
-                      ]}
-                    >
-                      <Ionicons
-                        name={
-                          transaction.type === "deposit"
-                            ? "arrow-down"
-                            : "arrow-up"
-                        }
-                        size={16}
-                        color={
-                          transaction.type === "deposit"
-                            ? Colors.success
-                            : Colors.error
-                        }
-                      />
-                    </View>
-
-                    <View style={styles.transactionDetails}>
-                      <Text style={styles.transactionDescription}>
-                        {transaction.description}
-                      </Text>
-                      <Text style={styles.transactionDate}>
-                        {new Date(transaction.date).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                          }
-                        )}
-                      </Text>
-                    </View>
-
-                    <Text
-                      style={[
-                        styles.transactionAmount,
-                        {
-                          color:
-                            transaction.type === "deposit"
-                              ? Colors.success
-                              : Colors.error,
-                        },
-                      ]}
-                    >
-                      {transaction.type === "deposit" ? "+" : "-"}$
-                      {transaction.amount.toFixed(2)}
-                    </Text>
+                {purchasesLoading ? (
+                  <View style={styles.loadingContainer}>
+                    <Text style={styles.loadingText}>Loading transactions...</Text>
                   </View>
-                ))}
+                ) : recentTransactions.length === 0 ? (
+                  <View style={styles.emptyTransactions}>
+                    <Ionicons name="receipt-outline" size={32} color={Colors.textSubtle} />
+                    <Text style={styles.emptyTransactionsText}>No recent transactions</Text>
+                  </View>
+                ) : (
+                  recentTransactions.map((transaction) => (
+                    <TouchableOpacity
+                      key={transaction.id}
+                      style={styles.transactionItem}
+                      onPress={() => handleTransactionPress(transaction.id)}
+                      activeOpacity={0.7}
+                    >
+                      <View
+                        style={[
+                          styles.transactionIcon,
+                          {
+                            backgroundColor: Colors.primary + "20",
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="receipt"
+                          size={16}
+                          color={Colors.primary}
+                        />
+                      </View>
+
+                      <View style={styles.transactionDetails}>
+                        <Text style={styles.transactionDescription}>
+                          {transaction.description}
+                        </Text>
+                        <View style={styles.transactionMeta}>
+                          <Text style={styles.transactionDate}>
+                            {new Date(transaction.date).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </Text>
+                          <View style={styles.paymentStatusContainer}>
+                            <View style={[
+                              styles.paymentStatusDot,
+                              { backgroundColor: transaction.isPaid ? Colors.success : Colors.warning }
+                            ]} />
+                            <Text style={[
+                              styles.paymentStatusText,
+                              { color: transaction.isPaid ? Colors.success : Colors.warning }
+                            ]}>
+                              {transaction.isPaid ? 'Paid' : 'Pending'}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+
+                      <View style={styles.transactionAmountContainer}>
+                        <Text style={styles.transactionAmount}>
+                          ${transaction.amount.toFixed(2)}
+                        </Text>
+                        <Text style={styles.paymentMethod}>
+                          {transaction.paymentMethod}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))
+                )}
               </View>
 
               {/* Wallet Stats */}
@@ -882,6 +889,44 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontWeight: "600",
+  },
+  // Purchase Transactions Styles
+  emptyTransactions: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  emptyTransactionsText: {
+    marginTop: 8,
+    color: Colors.textSubtle,
+    fontSize: 14,
+  },
+  transactionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 4,
+  },
+  paymentStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  paymentStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 4,
+  },
+  paymentStatusText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  transactionAmountContainer: {
+    alignItems: 'flex-end',
+  },
+  paymentMethod: {
+    fontSize: 12,
+    color: Colors.textSubtle,
+    marginTop: 2,
   },
   // Loading Styles
   loadingContainer: {

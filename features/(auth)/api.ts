@@ -1,6 +1,6 @@
 import { User } from "@/entities/User";
 import axios from "axios";
-const API_URL = "http://192.168.1.4:3000/api/auth";
+const API_URL = "http://192.168.1.26:3000/api/auth";
 
 export const verifyOtp = (email: string, otp: string) =>
   axios.post(`${API_URL}/verify-otp`, { email, otp });
