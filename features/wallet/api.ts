@@ -2,8 +2,8 @@ import { Wallet } from "@/entities/Wallet";
 import { WalletEntry } from "@/entities/WalletEntry";
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.26:3000/api/wallet"; // Add your API base URL here
-
+const API_BASE_URL = "http://192.168.1.4:3000/api/wallet"; // Add your API base URL here
+const API_BASE_URL_WALLET_ENTRY = "http://192.168.1.4:3000/api/member";
 // Function to get auth headers
 const getAuthHeaders = () => {
   const sessionManager = SessionManager.getInstance();
@@ -28,15 +28,19 @@ export interface WalletResponse {
   message?: string;
 }
 
+export interface WalletEntriesResponse {
+  data: WalletEntry[];
+  totalItems: number;
+  statusCode: number;
+  message: string;
+}
+
 // Get wallet information for a member
 export const getWallet = async (memberId: string): Promise<Wallet> => {
-
-
   const response = await fetch(`${API_BASE_URL}/member/${memberId}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
-
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -126,6 +130,24 @@ export const getWalletTransactions = async (
   }
 
   return response.json();
+};
+
+// Get wallet entries for the current member
+export const getWalletEntries = async (): Promise<WalletEntry[]> => {
+  const response = await fetch(`${API_BASE_URL_WALLET_ENTRY}/wallet-entries`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch wallet entries");
+  }
+
+  const responseData = await response.json();
+  console.log("Wallet entries response:", responseData);
+
+  // Handle the response structure: { data: [], totalItems: 0, statusCode: 200, message: "..." }
+  return responseData.data || [];
 };
 
 // Create wallet for a member

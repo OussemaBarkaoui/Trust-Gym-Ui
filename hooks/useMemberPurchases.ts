@@ -1,6 +1,10 @@
-import { useState, useEffect } from "react";
-import { getMemberPurchases, MemberPurchase, MemberPurchasesResponse } from "@/features/purchases/api";
+import {
+  getMemberPurchases,
+  MemberPurchase,
+  MemberPurchasesResponse,
+} from "@/features/purchases/api";
 import { showError } from "@/utils/showMessage";
+import { useEffect, useState } from "react";
 
 export const useMemberPurchases = () => {
   const [purchases, setPurchases] = useState<MemberPurchase[]>([]);
@@ -36,11 +40,29 @@ export const useMemberPurchases = () => {
     return purchases.slice(0, 4);
   };
 
+  // Calculate total spent for the current month
+  const getMonthlySpent = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    return purchases
+      .filter((purchase) => {
+        const purchaseDate = new Date(purchase.createdAt);
+        return (
+          purchaseDate.getMonth() === currentMonth &&
+          purchaseDate.getFullYear() === currentYear
+        );
+      })
+      .reduce((total, purchase) => total + parseFloat(purchase.total), 0);
+  };
+
   return {
     purchases,
     loading,
     totalItems,
     refreshPurchases,
     getRecentPurchases,
+    getMonthlySpent,
   };
 };

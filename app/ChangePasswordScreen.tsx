@@ -3,20 +3,19 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
+  Animated,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  StatusBar,
-  Animated,
 } from "react-native";
-import { Colors } from "../constants/Colors";
-import { useChangePassword } from "../hooks";
 import { Button } from "../components/ui/Button";
-import { useFadeIn, useSlideIn } from "../hooks";
+import { Colors } from "../constants/Colors";
+import { useChangePassword, useFadeIn, useSlideIn } from "../hooks";
 
 export default function ChangePasswordScreen() {
   const [oldPassword, setOldPassword] = useState("");
@@ -25,7 +24,7 @@ export default function ChangePasswordScreen() {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   const { changePassword, isLoading } = useChangePassword();
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
@@ -53,15 +52,18 @@ export default function ChangePasswordScreen() {
     }
 
     if (oldPassword === newPassword) {
-      Alert.alert("Error", "New password must be different from current password");
+      Alert.alert(
+        "Error",
+        "New password must be different from current password"
+      );
       return;
     }
 
     const result = await changePassword({
       oldPassword,
-      newPassword
+      newPassword,
     });
-    
+
     if (result.success) {
       // Reset form and navigate back
       setOldPassword("");
@@ -96,11 +98,11 @@ export default function ChangePasswordScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-      
+
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => router.back()}
           disabled={isLoading}
         >
@@ -119,8 +121,8 @@ export default function ChangePasswordScreen() {
           },
         ]}
       >
-        <ScrollView 
-          style={styles.scrollContainer} 
+        <ScrollView
+          style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -140,8 +142,8 @@ export default function ChangePasswordScreen() {
             {/* Current Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
-                <Ionicons name="lock-closed" size={16} color={Colors.primary} />
-                {" "}Current Password
+                <Ionicons name="lock-closed" size={16} color={Colors.primary} />{" "}
+                Current Password
               </Text>
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -172,8 +174,8 @@ export default function ChangePasswordScreen() {
             {/* New Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
-                <Ionicons name="key" size={16} color={Colors.primary} />
-                {" "}New Password
+                <Ionicons name="key" size={16} color={Colors.primary} /> New
+                Password
               </Text>
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -206,17 +208,19 @@ export default function ChangePasswordScreen() {
               <View style={styles.strengthContainer}>
                 <Text style={styles.strengthTitle}>Password Strength</Text>
                 <View style={styles.strengthBar}>
-                  <View 
+                  <View
                     style={[
                       styles.strengthFill,
-                      { 
+                      {
                         width: `${getPasswordStrength()}%`,
-                        backgroundColor: getStrengthColor()
-                      }
-                    ]} 
+                        backgroundColor: getStrengthColor(),
+                      },
+                    ]}
                   />
                 </View>
-                <Text style={[styles.strengthText, { color: getStrengthColor() }]}>
+                <Text
+                  style={[styles.strengthText, { color: getStrengthColor() }]}
+                >
                   {getStrengthText()}
                 </Text>
               </View>
@@ -225,8 +229,12 @@ export default function ChangePasswordScreen() {
             {/* Confirm Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.label}>
-                <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
-                {" "}Confirm New Password
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={Colors.primary}
+                />{" "}
+                Confirm New Password
               </Text>
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -257,46 +265,90 @@ export default function ChangePasswordScreen() {
             {/* Password Requirements */}
             <View style={styles.requirementsContainer}>
               <Text style={styles.requirementsTitle}>
-                <Ionicons name="information-circle" size={16} color={Colors.primary} />
-                {" "}Password Requirements
+                <Ionicons
+                  name="information-circle"
+                  size={16}
+                  color={Colors.primary}
+                />{" "}
+                Password Requirements
               </Text>
               <View style={styles.requirementsList}>
                 <View style={styles.requirementItem}>
-                  <Ionicons 
-                    name={newPassword.length >= 6 ? "checkmark-circle" : "ellipse-outline"} 
-                    size={16} 
-                    color={newPassword.length >= 6 ? Colors.success : Colors.textSubtle} 
+                  <Ionicons
+                    name={
+                      newPassword.length >= 6
+                        ? "checkmark-circle"
+                        : "ellipse-outline"
+                    }
+                    size={16}
+                    color={
+                      newPassword.length >= 6
+                        ? Colors.success
+                        : Colors.textSubtle
+                    }
                   />
-                  <Text style={[
-                    styles.requirement,
-                    newPassword.length >= 6 && styles.requirementMet
-                  ]}>
+                  <Text
+                    style={[
+                      styles.requirement,
+                      newPassword.length >= 6 && styles.requirementMet,
+                    ]}
+                  >
                     At least 6 characters long
                   </Text>
                 </View>
                 <View style={styles.requirementItem}>
-                  <Ionicons 
-                    name={oldPassword && newPassword && oldPassword !== newPassword ? "checkmark-circle" : "ellipse-outline"} 
-                    size={16} 
-                    color={oldPassword && newPassword && oldPassword !== newPassword ? Colors.success : Colors.textSubtle} 
+                  <Ionicons
+                    name={
+                      oldPassword && newPassword && oldPassword !== newPassword
+                        ? "checkmark-circle"
+                        : "ellipse-outline"
+                    }
+                    size={16}
+                    color={
+                      oldPassword && newPassword && oldPassword !== newPassword
+                        ? Colors.success
+                        : Colors.textSubtle
+                    }
                   />
-                  <Text style={[
-                    styles.requirement,
-                    oldPassword && newPassword && oldPassword !== newPassword && styles.requirementMet
-                  ]}>
+                  <Text
+                    style={[
+                      styles.requirement,
+                      oldPassword &&
+                        newPassword &&
+                        oldPassword !== newPassword &&
+                        styles.requirementMet,
+                    ]}
+                  >
                     Different from current password
                   </Text>
                 </View>
                 <View style={styles.requirementItem}>
-                  <Ionicons 
-                    name={newPassword && confirmPassword && newPassword === confirmPassword ? "checkmark-circle" : "ellipse-outline"} 
-                    size={16} 
-                    color={newPassword && confirmPassword && newPassword === confirmPassword ? Colors.success : Colors.textSubtle} 
+                  <Ionicons
+                    name={
+                      newPassword &&
+                      confirmPassword &&
+                      newPassword === confirmPassword
+                        ? "checkmark-circle"
+                        : "ellipse-outline"
+                    }
+                    size={16}
+                    color={
+                      newPassword &&
+                      confirmPassword &&
+                      newPassword === confirmPassword
+                        ? Colors.success
+                        : Colors.textSubtle
+                    }
                   />
-                  <Text style={[
-                    styles.requirement,
-                    newPassword && confirmPassword && newPassword === confirmPassword && styles.requirementMet
-                  ]}>
+                  <Text
+                    style={[
+                      styles.requirement,
+                      newPassword &&
+                        confirmPassword &&
+                        newPassword === confirmPassword &&
+                        styles.requirementMet,
+                    ]}
+                  >
                     Passwords match
                   </Text>
                 </View>
@@ -310,7 +362,9 @@ export default function ChangePasswordScreen() {
           <Button
             title={isLoading ? "Changing Password..." : "Change Password"}
             onPress={handleChangePassword}
-            disabled={isLoading || !oldPassword || !newPassword || !confirmPassword}
+            disabled={
+              isLoading || !oldPassword || !newPassword || !confirmPassword
+            }
             style={styles.changeButton}
           />
         </View>

@@ -1,6 +1,6 @@
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.26:3000/api/member-purchase";
+const API_BASE_URL = "http://192.168.1.4:3000/api/member-purchase";
 
 // Function to get auth headers
 const getAuthHeaders = () => {
@@ -46,31 +46,34 @@ export interface MemberPurchasesResponse {
   message: string;
 }
 
-export const getMemberPurchases = async (): Promise<MemberPurchasesResponse> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/member/purchase`, {
-      method: "GET",
-      headers: getAuthHeaders(),
-    });
+export const getMemberPurchases =
+  async (): Promise<MemberPurchasesResponse> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/member/purchase`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("getMemberPurchases response:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching member purchases:", error);
+      throw error;
     }
+  };
 
-    const data = await response.json();
-    console.log("getMemberPurchases response:", data);
-    return data;
-  } catch (error) {
-    console.error("Error fetching member purchases:", error);
-    throw error;
-  }
-};
-
-export const getMemberPurchaseById = async (purchaseId: string): Promise<MemberPurchase> => {
+export const getMemberPurchaseById = async (
+  purchaseId: string
+): Promise<MemberPurchase> => {
   try {
     const url = `${API_BASE_URL}/${purchaseId}`;
     console.log("Fetching purchase from URL:", url);
-    
+
     const response = await fetch(url, {
       method: "GET",
       headers: getAuthHeaders(),
@@ -87,7 +90,7 @@ export const getMemberPurchaseById = async (purchaseId: string): Promise<MemberP
 
     const responseData = await response.json();
     console.log("Parsed response data:", responseData);
-    
+
     // Extract the actual purchase data from the response
     return responseData.data;
   } catch (error) {

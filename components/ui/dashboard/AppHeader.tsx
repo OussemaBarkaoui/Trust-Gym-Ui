@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
 import { useSession } from "../../../contexts/SessionContext";
-import { useLogout } from "../../../hooks/useLogout";
 import { refreshUserProfileInSession } from "../../../features/profile/api";
+import { useLogout } from "../../../hooks/useLogout";
 
 interface AppHeaderProps {
   title: string;
@@ -71,7 +71,7 @@ export default function AppHeader({
         await refreshUserProfileInSession();
       }
     };
-    
+
     loadProfileData();
   }, [session.isAuthenticated, session.user?.id]);
 
@@ -102,9 +102,9 @@ export default function AppHeader({
               >
                 <View style={styles.profileAvatar}>
                   {session.user?.imageUrl ? (
-                    <Image 
-                      source={{ uri: session.user.imageUrl }} 
-                      style={styles.avatarImage} 
+                    <Image
+                      source={{ uri: session.user.imageUrl }}
+                      style={styles.avatarImage}
                     />
                   ) : (
                     <Text style={styles.avatarText}>{getUserInitials()}</Text>
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   avatarImage: {
     width: 44,

@@ -2,18 +2,21 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
+  Animated,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  StatusBar,
-  Animated,
-  ActivityIndicator,
 } from "react-native";
 import { Colors } from "../constants/Colors";
-import { MemberPurchase, getMemberPurchaseById } from "../features/purchases/api";
+import {
+  MemberPurchase,
+  getMemberPurchaseById,
+} from "../features/purchases/api";
 import { useFadeIn, useSlideIn } from "../hooks";
 import { showError } from "../utils/showMessage";
 
@@ -21,7 +24,7 @@ export default function PurchaseDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [purchase, setPurchase] = useState<MemberPurchase | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
 
@@ -50,28 +53,28 @@ export default function PurchaseDetailsScreen() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatAmount = (amount: string) => {
-    return `$${parseFloat(amount).toFixed(2)}`;
+    return `${parseFloat(amount).toFixed(2)}DT`;
   };
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-        
+
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
+          <TouchableOpacity
+            style={styles.backButton}
             onPress={() => router.back()}
           >
             <Ionicons name="arrow-back" size={24} color={Colors.text} />
@@ -92,11 +95,11 @@ export default function PurchaseDetailsScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-        
+
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
+          <TouchableOpacity
+            style={styles.backButton}
             onPress={() => router.back()}
           >
             <Ionicons name="arrow-back" size={24} color={Colors.text} />
@@ -116,11 +119,11 @@ export default function PurchaseDetailsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-      
+
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => router.back()}
         >
           <Ionicons name="arrow-back" size={24} color={Colors.text} />
@@ -138,20 +141,26 @@ export default function PurchaseDetailsScreen() {
           },
         ]}
       >
-        <ScrollView 
-          style={styles.scrollContainer} 
+        <ScrollView
+          style={styles.scrollContainer}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
           {/* Status Card */}
           <View style={styles.statusCard}>
             <View style={styles.statusHeader}>
-              <View style={[
-                styles.statusIndicator,
-                { backgroundColor: purchase.isPaid ? Colors.success : Colors.warning }
-              ]} />
+              <View
+                style={[
+                  styles.statusIndicator,
+                  {
+                    backgroundColor: purchase.isPaid
+                      ? Colors.success
+                      : Colors.warning,
+                  },
+                ]}
+              />
               <Text style={styles.statusText}>
-                {purchase.isPaid ? 'Paid' : 'Pending Payment'}
+                {purchase.isPaid ? "Paid" : "Pending Payment"}
               </Text>
             </View>
             <Text style={styles.purchaseId}>Purchase ID: {purchase.id}</Text>
@@ -170,7 +179,9 @@ export default function PurchaseDetailsScreen() {
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Unit Price</Text>
-                <Text style={styles.detailValue}>{formatAmount(purchase.product.unitPrice.toString())}</Text>
+                <Text style={styles.detailValue}>
+                  {formatAmount(purchase.product.unitPrice.toString())}
+                </Text>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Quantity</Text>
@@ -178,7 +189,9 @@ export default function PurchaseDetailsScreen() {
               </View>
               <View style={[styles.detailRow, styles.totalRow]}>
                 <Text style={styles.totalLabel}>Total Amount</Text>
-                <Text style={styles.totalValue}>{formatAmount(purchase.total)}</Text>
+                <Text style={styles.totalValue}>
+                  {formatAmount(purchase.total)}
+                </Text>
               </View>
             </View>
           </View>
@@ -197,21 +210,35 @@ export default function PurchaseDetailsScreen() {
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Payment Status</Text>
                 <View style={styles.paymentStatusContainer}>
-                  <View style={[
-                    styles.paymentStatusIndicator,
-                    { backgroundColor: purchase.isPaid ? Colors.success : Colors.warning }
-                  ]} />
-                  <Text style={[
-                    styles.paymentStatusText,
-                    { color: purchase.isPaid ? Colors.success : Colors.warning }
-                  ]}>
-                    {purchase.isPaid ? 'Paid' : 'Pending'}
+                  <View
+                    style={[
+                      styles.paymentStatusIndicator,
+                      {
+                        backgroundColor: purchase.isPaid
+                          ? Colors.success
+                          : Colors.warning,
+                      },
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.paymentStatusText,
+                      {
+                        color: purchase.isPaid
+                          ? Colors.success
+                          : Colors.warning,
+                      },
+                    ]}
+                  >
+                    {purchase.isPaid ? "Paid" : "Pending"}
                   </Text>
                 </View>
               </View>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Purchase Date</Text>
-                <Text style={styles.detailValue}>{formatDate(purchase.createdAt)}</Text>
+                <Text style={styles.detailValue}>
+                  {formatDate(purchase.createdAt)}
+                </Text>
               </View>
             </View>
           </View>

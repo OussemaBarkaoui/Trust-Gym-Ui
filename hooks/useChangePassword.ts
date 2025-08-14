@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { changeMemberPassword, ChangePasswordRequest } from "@/features/profile/api";
+import {
+  changeMemberPassword,
+  ChangePasswordRequest,
+} from "@/features/profile/api";
 import { showError, showSuccess } from "@/utils/showMessage";
+import { useState } from "react";
 
 export const useChangePassword = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,11 +11,11 @@ export const useChangePassword = () => {
   const changePassword = async (passwordData: ChangePasswordRequest) => {
     try {
       setIsLoading(true);
-      
+
       const result = await changeMemberPassword(passwordData);
-      
+
       showSuccess(result.message || "Password changed successfully!");
-      
+
       return { success: true, data: result };
     } catch (error: any) {
       console.error("Change password error:", error);

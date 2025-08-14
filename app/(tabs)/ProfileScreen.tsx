@@ -16,9 +16,9 @@ import {
 import { AppHeader, Button } from "../../components/ui";
 import { Colors } from "../../constants/Colors";
 import { useSession } from "../../contexts/SessionContext";
+import { refreshUserProfileInSession } from "../../features/profile/api";
 import { useFadeIn, useLogout, useSlideIn } from "../../hooks";
 import { showSuccess } from "../../utils/showMessage";
-import { refreshUserProfileInSession } from "../../features/profile/api";
 
 export default function ProfileScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
@@ -33,7 +33,7 @@ export default function ProfileScreen() {
         await refreshUserProfileInSession();
       }
     };
-    
+
     loadProfileData();
   }, [session.isAuthenticated, session.user?.id]);
 
@@ -141,9 +141,9 @@ export default function ProfileScreen() {
           <View style={styles.profileHeader}>
             <View style={styles.avatarContainer}>
               {session.user?.imageUrl ? (
-                <Image 
-                  source={{ uri: session.user.imageUrl }} 
-                  style={styles.avatarImage} 
+                <Image
+                  source={{ uri: session.user.imageUrl }}
+                  style={styles.avatarImage}
                 />
               ) : (
                 <Text style={styles.avatarText}>{getUserInitials()}</Text>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   avatarImage: {
     width: 80,

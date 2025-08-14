@@ -1,5 +1,5 @@
-import { SessionManager } from "@/services/SessionManager";
 import { UserProfile } from "@/entities/User";
+import { SessionManager } from "@/services/SessionManager";
 
 const API_BASE_URL = "http://192.168.1.4:3000/api/member";
 const FILES_API_BASE_URL = "http://192.168.1.4:3000/api/files";
@@ -61,16 +61,16 @@ export const uploadFile = async (file: {
   const currentSession = sessionManager.getSessionState();
 
   const formData = new FormData();
-  
+
   // Create the file object for React Native with proper format
   // React Native requires this specific format for file uploads
   const fileObject = {
     uri: file.uri,
-    type: file.type || 'image/jpeg', // Default to JPEG if type is missing
+    type: file.type || "image/jpeg", // Default to JPEG if type is missing
     name: file.name || `image_${Date.now()}.jpg`, // Generate name if missing
   };
-  
-  formData.append('file', fileObject as any);
+
+  formData.append("file", fileObject as any);
 
   try {
     const response = await fetch(`${FILES_API_BASE_URL}/upload`, {
@@ -86,17 +86,19 @@ export const uploadFile = async (file: {
 
     if (!response.ok) {
       const errorText = await response.text();
-      
+
       let errorData;
       try {
         errorData = JSON.parse(errorText);
       } catch {
-        errorData = { message: errorText || 'Upload failed' };
+        errorData = { message: errorText || "Upload failed" };
       }
 
-      const errorMessage = 
-        errorData.message || errorData.en || `Upload failed with status ${response.status}`;
-      
+      const errorMessage =
+        errorData.message ||
+        errorData.en ||
+        `Upload failed with status ${response.status}`;
+
       throw new Error(errorMessage);
     }
 
@@ -111,25 +113,28 @@ export const uploadFile = async (file: {
 export const getCurrentUserProfile = async (): Promise<UserProfile> => {
   const sessionManager = SessionManager.getInstance();
   const currentSession = sessionManager.getSessionState();
-  
+
   if (!currentSession.user?.id) {
     throw new Error("User ID not found in session");
   }
 
-  const response = await fetch(`${API_BASE_URL}/profile/${currentSession.user.id}`, {
-    method: "GET",
-    headers: getAuthHeaders(),
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/profile/${currentSession.user.id}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const errorMessage = 
+    const errorMessage =
       errorData.message || errorData.en || "Failed to fetch profile";
     throw new Error(errorMessage);
   }
 
   const result = await response.json();
-  
+
   // Transform the backend response to match UserProfile interface
   const userProfile: UserProfile = {
     id: result.id,
@@ -147,7 +152,7 @@ export const getCurrentUserProfile = async (): Promise<UserProfile> => {
     partner: result.partner,
     gym: result.gym,
   };
-  
+
   return userProfile;
 };
 
@@ -155,11 +160,11 @@ export const getCurrentUserProfile = async (): Promise<UserProfile> => {
 export const refreshUserProfileInSession = async (): Promise<void> => {
   try {
     const updatedProfile = await getCurrentUserProfile();
-    
+
     const sessionManager = SessionManager.getInstance();
     await sessionManager.updateUserProfile(updatedProfile);
   } catch (error) {
-    console.error('Failed to refresh user profile in session:', error);
+    console.error("Failed to refresh user profile in session:", error);
   }
 };
 
@@ -175,7 +180,7 @@ export const updateMemberProfile = async (
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const errorMessage = 
+    const errorMessage =
       errorData.message || errorData.en || "Failed to update profile";
     throw new Error(errorMessage);
   }
@@ -196,7 +201,7 @@ export const changeMemberPassword = async (
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    const errorMessage = 
+    const errorMessage =
       errorData.message || errorData.en || "Failed to change password";
     throw new Error(errorMessage);
   }

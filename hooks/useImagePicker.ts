@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Alert, Platform } from "react-native";
-import * as ImagePicker from "expo-image-picker";
 import { uploadFile } from "@/features/profile/api";
 import { showError, showSuccess } from "@/utils/showMessage";
+import * as ImagePicker from "expo-image-picker";
+import { useState } from "react";
+import { Alert, Platform } from "react-native";
 
 export interface ImagePickerResult {
   uri: string;
@@ -14,12 +14,13 @@ export const useImagePicker = () => {
   const [isUploading, setIsUploading] = useState(false);
 
   const requestPermissions = async () => {
-    if (Platform.OS !== 'web') {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
         Alert.alert(
-          'Permission Required',
-          'Sorry, we need camera roll permissions to upload images!'
+          "Permission Required",
+          "Sorry, we need camera roll permissions to upload images!"
         );
         return false;
       }
@@ -48,8 +49,8 @@ export const useImagePicker = () => {
         };
       }
     } catch (error) {
-      console.error('Image picker error:', error);
-      showError('Failed to pick image');
+      console.error("Image picker error:", error);
+      showError("Failed to pick image");
     }
 
     return null;
@@ -57,10 +58,10 @@ export const useImagePicker = () => {
 
   const takePhoto = async (): Promise<ImagePickerResult | null> => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       Alert.alert(
-        'Permission Required',
-        'Sorry, we need camera permissions to take photos!'
+        "Permission Required",
+        "Sorry, we need camera permissions to take photos!"
       );
       return null;
     }
@@ -81,39 +82,41 @@ export const useImagePicker = () => {
         };
       }
     } catch (error) {
-      console.error('Camera error:', error);
-      showError('Failed to take photo');
+      console.error("Camera error:", error);
+      showError("Failed to take photo");
     }
 
     return null;
   };
 
-  const uploadImage = async (imageData: ImagePickerResult): Promise<ImagePickerResult | null> => {
+  const uploadImage = async (
+    imageData: ImagePickerResult
+  ): Promise<ImagePickerResult | null> => {
     try {
       setIsUploading(true);
 
-      console.log('🔍 Starting image upload:', {
+      console.log("🔍 Starting image upload:", {
         fileName: imageData.fileName,
-        uri: imageData.uri.substring(0, 50) + '...',
+        uri: imageData.uri.substring(0, 50) + "...",
       });
 
       const fileToUpload = {
         uri: imageData.uri,
-        type: 'image/jpeg',
+        type: "image/jpeg",
         name: imageData.fileName,
       };
 
-      console.log('🔍 File details before upload:', {
+      console.log("🔍 File details before upload:", {
         fileName: imageData.fileName,
         uri: imageData.uri,
-        type: 'image/jpeg',
+        type: "image/jpeg",
         uriLength: imageData.uri.length,
       });
 
       const uploadResult = await uploadFile(fileToUpload);
-      
-      console.log('✅ Upload result:', uploadResult);
-      showSuccess('Image uploaded successfully!');
+
+      console.log("✅ Upload result:", uploadResult);
+      showSuccess("Image uploaded successfully!");
 
       return {
         uri: imageData.uri,
@@ -121,8 +124,8 @@ export const useImagePicker = () => {
         imageUrl: uploadResult.fileUrl,
       };
     } catch (error: any) {
-      console.error('❌ Upload error:', error);
-      showError(error.message || 'Failed to upload image');
+      console.error("❌ Upload error:", error);
+      showError(error.message || "Failed to upload image");
       return null;
     } finally {
       setIsUploading(false);
@@ -132,26 +135,26 @@ export const useImagePicker = () => {
   const showImagePickerOptions = (): Promise<ImagePickerResult | null> => {
     return new Promise((resolve) => {
       Alert.alert(
-        'Select Photo',
-        'Choose how you want to select a photo',
+        "Select Photo",
+        "Choose how you want to select a photo",
         [
           {
-            text: 'Camera',
+            text: "Camera",
             onPress: async () => {
               const result = await takePhoto();
               resolve(result);
             },
           },
           {
-            text: 'Photo Library',
+            text: "Photo Library",
             onPress: async () => {
               const result = await pickImage();
               resolve(result);
             },
           },
           {
-            text: 'Cancel',
-            style: 'cancel',
+            text: "Cancel",
+            style: "cancel",
             onPress: () => resolve(null),
           },
         ],

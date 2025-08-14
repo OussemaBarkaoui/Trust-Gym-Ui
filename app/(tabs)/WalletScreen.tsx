@@ -19,14 +19,29 @@ import { Colors } from "../../constants/Colors";
 import { useSession } from "../../contexts/SessionContext";
 import { Wallet } from "../../entities/Wallet";
 import { createWallet, getWallet } from "../../features/wallet/api";
-import { useFadeIn, useSlideIn, useMemberPurchases } from "../../hooks";
+import {
+  useFadeIn,
+  useMemberPurchases,
+  useSlideIn,
+  useWalletEntries,
+} from "../../hooks";
 import { showError, showSuccess } from "../../utils/showMessage";
 
 export default function WalletScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
   const { session } = useSession();
-  const { getRecentPurchases, loading: purchasesLoading, refreshPurchases } = useMemberPurchases();
+  const {
+    getRecentPurchases,
+    loading: purchasesLoading,
+    refreshPurchases,
+    getMonthlySpent,
+  } = useMemberPurchases();
+  const {
+    getMonthlyIncome,
+    loading: entriesLoading,
+    refreshEntries,
+  } = useWalletEntries();
 
   // State for wallet operations
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -45,7 +60,6 @@ export default function WalletScreen() {
   // Fetch wallet data function
   const fetchWalletData = useCallback(async () => {
     if (!session.user?.id) return;
-
 
     try {
       const walletData = await getWallet(session.user.id);
@@ -78,10 +92,11 @@ export default function WalletScreen() {
     setRefreshing(true);
     await Promise.all([
       fetchWalletData(),
-      refreshPurchases()
+      refreshPurchases(),
+      refreshEntries(),
     ]);
     setRefreshing(false);
-  }, [fetchWalletData, refreshPurchases]);
+  }, [fetchWalletData, refreshPurchases, refreshEntries]);
 
   // Initial wallet data fetch
   useEffect(() => {
@@ -117,7 +132,6 @@ export default function WalletScreen() {
   // Create wallet function
   const handleCreateWallet = async () => {
     if (!session.user?.id) return;
-
 
     setCreatingWallet(true);
     try {
@@ -209,7 +223,6 @@ export default function WalletScreen() {
     router.push(`/PurchaseDetailsScreen?id=${transactionId}`);
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
@@ -288,7 +301,6 @@ export default function WalletScreen() {
                       <Text style={styles.balanceAmount}>Loading...</Text>
                     ) : (
                       <Text style={styles.balanceAmount}>
-                        
                         {walletBalance.toLocaleString("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -315,18 +327,6 @@ export default function WalletScreen() {
                     />
                     <Text style={styles.actionButtonText}>Deposit</Text>
                   </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.withdrawButton]}
-                    onPress={() => handleOpenModal("withdraw")}
-                  >
-                    <Ionicons
-                      name="remove-circle"
-                      size={20}
-                      color={Colors.white}
-                    />
-                    <Text style={styles.actionButtonText}>Withdraw</Text>
-                  </TouchableOpacity>
                 </View>
               </View>
 
@@ -341,12 +341,20 @@ export default function WalletScreen() {
 
                 {purchasesLoading ? (
                   <View style={styles.loadingContainer}>
-                    <Text style={styles.loadingText}>Loading transactions...</Text>
+                    <Text style={styles.loadingText}>
+                      Loading transactions...
+                    </Text>
                   </View>
                 ) : recentTransactions.length === 0 ? (
                   <View style={styles.emptyTransactions}>
-                    <Ionicons name="receipt-outline" size={32} color={Colors.textSubtle} />
-                    <Text style={styles.emptyTransactionsText}>No recent transactions</Text>
+                    <Ionicons
+                      name="receipt-outline"
+                      size={32}
+                      color={Colors.textSubtle}
+                    />
+                    <Text style={styles.emptyTransactionsText}>
+                      No recent transactions
+                    </Text>
                   </View>
                 ) : (
                   recentTransactions.map((transaction) => (
@@ -386,15 +394,27 @@ export default function WalletScreen() {
                             )}
                           </Text>
                           <View style={styles.paymentStatusContainer}>
-                            <View style={[
-                              styles.paymentStatusDot,
-                              { backgroundColor: transaction.isPaid ? Colors.success : Colors.warning }
-                            ]} />
-                            <Text style={[
-                              styles.paymentStatusText,
-                              { color: transaction.isPaid ? Colors.success : Colors.warning }
-                            ]}>
-                              {transaction.isPaid ? 'Paid' : 'Pending'}
+                            <View
+                              style={[
+                                styles.paymentStatusDot,
+                                {
+                                  backgroundColor: transaction.isPaid
+                                    ? Colors.success
+                                    : Colors.warning,
+                                },
+                              ]}
+                            />
+                            <Text
+                              style={[
+                                styles.paymentStatusText,
+                                {
+                                  color: transaction.isPaid
+                                    ? Colors.success
+                                    : Colors.warning,
+                                },
+                              ]}
+                            >
+                              {transaction.isPaid ? "Paid" : "Pending"}
                             </Text>
                           </View>
                         </View>
@@ -402,7 +422,7 @@ export default function WalletScreen() {
 
                       <View style={styles.transactionAmountContainer}>
                         <Text style={styles.transactionAmount}>
-                          ${transaction.amount.toFixed(2)}
+                          {transaction.amount.toFixed(2)}DT
                         </Text>
                         <Text style={styles.paymentMethod}>
                           {transaction.paymentMethod}
@@ -415,7 +435,7 @@ export default function WalletScreen() {
 
               {/* Wallet Stats */}
               <View style={styles.statsSection}>
-                <Text style={styles.sectionTitle}>This Month</Text>
+                <Text style={styles.sectionTitle}>Wallet Stats</Text>
 
                 <View style={styles.statsGrid}>
                   <View style={styles.statItem}>
@@ -431,8 +451,10 @@ export default function WalletScreen() {
                         color={Colors.success}
                       />
                     </View>
-                    <Text style={styles.statLabel}>Deposited</Text>
-                    <Text style={styles.statValue}>$300.00</Text>
+                    <Text style={styles.statLabel}>IN</Text>
+                    <Text style={styles.statValue}>
+                      {entriesLoading ? "..." : getMonthlyIncome().toFixed(2)}DT
+                    </Text>
                   </View>
 
                   <View style={styles.statItem}>
@@ -448,8 +470,11 @@ export default function WalletScreen() {
                         color={Colors.error}
                       />
                     </View>
-                    <Text style={styles.statLabel}>Withdrawn</Text>
-                    <Text style={styles.statValue}>$125.50</Text>
+                    <Text style={styles.statLabel}>OUT</Text>
+                    <Text style={styles.statValue}>
+                      {purchasesLoading ? "..." : getMonthlySpent().toFixed(2)}
+                      DT
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -892,7 +917,7 @@ const styles = StyleSheet.create({
   },
   // Purchase Transactions Styles
   emptyTransactions: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 32,
   },
   emptyTransactionsText: {
@@ -901,14 +926,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   transactionMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 4,
   },
   paymentStatusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   paymentStatusDot: {
     width: 6,
@@ -918,10 +943,10 @@ const styles = StyleSheet.create({
   },
   paymentStatusText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   transactionAmountContainer: {
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   paymentMethod: {
     fontSize: 12,

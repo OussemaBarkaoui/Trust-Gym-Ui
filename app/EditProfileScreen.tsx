@@ -1,3 +1,6 @@
+import { Button, LabeledInput } from "@/components/ui";
+import { Colors } from "@/constants/Colors";
+import { useEditProfile, useFadeIn, useImagePicker, useSlideIn } from "@/hooks";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -15,9 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Button, LabeledInput, Input } from "@/components/ui";
-import { Colors } from "@/constants/Colors";
-import { useFadeIn, useSlideIn, useEditProfile, useImagePicker } from "@/hooks";
 
 export default function EditProfileScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
@@ -44,12 +44,12 @@ export default function EditProfileScreen() {
   } | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const newData = {
         ...prev,
         [field]: value,
       };
-      
+
       // Check if there are changes
       const originalData = {
         firstName: currentUser?.firstName || "",
@@ -59,14 +59,14 @@ export default function EditProfileScreen() {
         city: currentUser?.city || "",
         profession: currentUser?.profession || "",
       };
-      
+
       setHasChanges(JSON.stringify(newData) !== JSON.stringify(originalData));
       return newData;
     });
-    
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [field]: "",
       }));
@@ -109,19 +109,19 @@ export default function EditProfileScreen() {
     try {
       // Prepare update payload - only include changed fields
       const updatePayload: any = {};
-      
+
       if (formData.firstName !== currentUser?.firstName) {
         updatePayload.firstName = formData.firstName;
       }
-      
+
       if (formData.lastName !== currentUser?.lastName) {
         updatePayload.lastName = formData.lastName;
       }
-      
+
       if (formData.phone !== (currentUser?.phone || "")) {
         updatePayload.phone = formData.phone;
       }
-      
+
       if (formData.address !== (currentUser?.address || "")) {
         updatePayload.address = formData.address;
       }
@@ -141,14 +141,18 @@ export default function EditProfileScreen() {
           fileName: profileImage.fileName,
         };
         const uploadedImage = await uploadImage(imageToUpload);
-        
+
         if (uploadedImage && uploadedImage.imageUrl) {
           updatePayload.memberImage = {
             fileName: uploadedImage.fileName,
             imageUrl: uploadedImage.imageUrl,
           };
         }
-      } else if (profileImage && profileImage.imageUrl && profileImage.fileName) {
+      } else if (
+        profileImage &&
+        profileImage.imageUrl &&
+        profileImage.fileName
+      ) {
         // Image already uploaded
         updatePayload.memberImage = {
           fileName: profileImage.fileName,
@@ -157,13 +161,13 @@ export default function EditProfileScreen() {
       }
 
       const result = await updateProfile(updatePayload);
-      
+
       if (result.success) {
         // Navigate back to profile screen
         router.back();
       }
     } catch (error) {
-      console.error('Save profile error:', error);
+      console.error("Save profile error:", error);
     }
   };
 
@@ -174,7 +178,11 @@ export default function EditProfileScreen() {
         "Are you sure you want to discard your changes?",
         [
           { text: "Keep Editing", style: "cancel" },
-          { text: "Discard", style: "destructive", onPress: () => router.back() },
+          {
+            text: "Discard",
+            style: "destructive",
+            onPress: () => router.back(),
+          },
         ]
       );
     } else {
@@ -214,18 +222,26 @@ export default function EditProfileScreen() {
           >
             {/* Profile Avatar Section */}
             <View style={styles.avatarSection}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.avatarContainer}
                 onPress={handleImagePicker}
                 disabled={isLoading || isUploading}
               >
                 {profileImage ? (
-                  <Image source={{ uri: profileImage.uri }} style={styles.avatarImage} />
+                  <Image
+                    source={{ uri: profileImage.uri }}
+                    style={styles.avatarImage}
+                  />
                 ) : currentUser?.imageUrl ? (
-                  <Image source={{ uri: currentUser.imageUrl }} style={styles.avatarImage} />
+                  <Image
+                    source={{ uri: currentUser.imageUrl }}
+                    style={styles.avatarImage}
+                  />
                 ) : (
                   <Text style={styles.avatarText}>
-                    {(formData.firstName.charAt(0) + formData.lastName.charAt(0)).toUpperCase()}
+                    {(
+                      formData.firstName.charAt(0) + formData.lastName.charAt(0)
+                    ).toUpperCase()}
                   </Text>
                 )}
                 <View style={styles.avatarOverlay}>
@@ -244,17 +260,23 @@ export default function EditProfileScreen() {
             {/* Personal Information Section */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Ionicons name="person-outline" size={20} color={Colors.primary} />
+                <Ionicons
+                  name="person-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
                 <Text style={styles.sectionTitle}>Personal Information</Text>
               </View>
-              
+
               <View style={styles.formRow}>
                 <View style={styles.halfWidth}>
                   <LabeledInput
                     label="First Name"
                     placeholder="Enter your first name"
                     value={formData.firstName}
-                    onChangeText={(value: string) => handleInputChange("firstName", value)}
+                    onChangeText={(value: string) =>
+                      handleInputChange("firstName", value)
+                    }
                     error={errors.firstName}
                     editable={!isLoading}
                   />
@@ -264,7 +286,9 @@ export default function EditProfileScreen() {
                     label="Last Name"
                     placeholder="Enter your last name"
                     value={formData.lastName}
-                    onChangeText={(value: string) => handleInputChange("lastName", value)}
+                    onChangeText={(value: string) =>
+                      handleInputChange("lastName", value)
+                    }
                     error={errors.lastName}
                     editable={!isLoading}
                   />
@@ -275,7 +299,9 @@ export default function EditProfileScreen() {
                 label="Phone Number"
                 placeholder="Enter your phone number"
                 value={formData.phone}
-                onChangeText={(value: string) => handleInputChange("phone", value)}
+                onChangeText={(value: string) =>
+                  handleInputChange("phone", value)
+                }
                 keyboardType="phone-pad"
                 editable={!isLoading}
               />
@@ -284,7 +310,9 @@ export default function EditProfileScreen() {
                 label="Profession"
                 placeholder="Enter your profession"
                 value={formData.profession}
-                onChangeText={(value: string) => handleInputChange("profession", value)}
+                onChangeText={(value: string) =>
+                  handleInputChange("profession", value)
+                }
                 editable={!isLoading}
               />
             </View>
@@ -292,7 +320,11 @@ export default function EditProfileScreen() {
             {/* Location Section */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Ionicons name="location-outline" size={20} color={Colors.primary} />
+                <Ionicons
+                  name="location-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
                 <Text style={styles.sectionTitle}>Location Information</Text>
               </View>
 
@@ -300,7 +332,9 @@ export default function EditProfileScreen() {
                 label="City"
                 placeholder="Enter your city"
                 value={formData.city}
-                onChangeText={(value: string) => handleInputChange("city", value)}
+                onChangeText={(value: string) =>
+                  handleInputChange("city", value)
+                }
                 editable={!isLoading}
               />
 
@@ -308,7 +342,9 @@ export default function EditProfileScreen() {
                 label="Address"
                 placeholder="Enter your address"
                 value={formData.address}
-                onChangeText={(value: string) => handleInputChange("address", value)}
+                onChangeText={(value: string) =>
+                  handleInputChange("address", value)
+                }
                 multiline
                 numberOfLines={3}
                 editable={!isLoading}
@@ -318,10 +354,14 @@ export default function EditProfileScreen() {
             {/* Account Information Section */}
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Ionicons name="shield-outline" size={20} color={Colors.primary} />
+                <Ionicons
+                  name="shield-outline"
+                  size={20}
+                  color={Colors.primary}
+                />
                 <Text style={styles.sectionTitle}>Account Information</Text>
               </View>
-              
+
               <LabeledInput
                 label="Email"
                 value={currentUser?.email || ""}
@@ -329,14 +369,19 @@ export default function EditProfileScreen() {
                 style={styles.readOnlyInput}
               />
               <Text style={styles.readOnlyNote}>
-                📧 Email cannot be changed. Contact support if you need to update your email address.
+                📧 Email cannot be changed. Contact support if you need to
+                update your email address.
               </Text>
             </View>
 
             {/* Changes Indicator */}
             {hasChanges && (
               <View style={styles.changesIndicator}>
-                <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
+                <Ionicons
+                  name="checkmark-circle"
+                  size={16}
+                  color={Colors.success}
+                />
                 <Text style={styles.changesText}>You have unsaved changes</Text>
               </View>
             )}

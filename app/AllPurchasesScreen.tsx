@@ -14,19 +14,20 @@ import {
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import { MemberPurchase } from "../features/purchases/api";
-import { useFadeIn, useSlideIn, useMemberPurchases } from "../hooks";
+import { useFadeIn, useMemberPurchases, useSlideIn } from "../hooks";
 
 export default function AllPurchasesScreen() {
-  const { purchases, loading, totalItems, refreshPurchases } = useMemberPurchases();
+  const { purchases, loading, totalItems, refreshPurchases } =
+    useMemberPurchases();
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -54,20 +55,28 @@ export default function AllPurchasesScreen() {
         <View style={styles.purchaseAmount}>
           <Text style={styles.amountText}>{formatAmount(item.total)}</Text>
           <View style={styles.statusContainer}>
-            <View style={[
-              styles.statusDot,
-              { backgroundColor: item.isPaid ? Colors.success : Colors.warning }
-            ]} />
-            <Text style={[
-              styles.statusText,
-              { color: item.isPaid ? Colors.success : Colors.warning }
-            ]}>
-              {item.isPaid ? 'Paid' : 'Pending'}
+            <View
+              style={[
+                styles.statusDot,
+                {
+                  backgroundColor: item.isPaid
+                    ? Colors.success
+                    : Colors.warning,
+                },
+              ]}
+            />
+            <Text
+              style={[
+                styles.statusText,
+                { color: item.isPaid ? Colors.success : Colors.warning },
+              ]}
+            >
+              {item.isPaid ? "Paid" : "Pending"}
             </Text>
           </View>
         </View>
       </View>
-      
+
       <View style={styles.purchaseDetails}>
         <View style={styles.detailItem}>
           <Ionicons name="cube-outline" size={14} color={Colors.textSubtle} />
@@ -78,11 +87,17 @@ export default function AllPurchasesScreen() {
           <Text style={styles.detailText}>{item.paymentMethod}</Text>
         </View>
         <View style={styles.detailItem}>
-          <Ionicons name="location-outline" size={14} color={Colors.textSubtle} />
-          <Text style={styles.detailText} numberOfLines={1}>{item.gym.location}</Text>
+          <Ionicons
+            name="location-outline"
+            size={14}
+            color={Colors.textSubtle}
+          />
+          <Text style={styles.detailText} numberOfLines={1}>
+            {item.gym.location}
+          </Text>
         </View>
       </View>
-      
+
       <View style={styles.chevronContainer}>
         <Ionicons name="chevron-forward" size={20} color={Colors.textSubtle} />
       </View>
@@ -94,7 +109,8 @@ export default function AllPurchasesScreen() {
       <Ionicons name="receipt-outline" size={64} color={Colors.textSubtle} />
       <Text style={styles.emptyTitle}>No Purchases Found</Text>
       <Text style={styles.emptyDescription}>
-        You haven't made any purchases yet. Start shopping to see your purchase history here!
+        You haven't made any purchases yet. Start shopping to see your purchase
+        history here!
       </Text>
     </View>
   );
@@ -109,17 +125,16 @@ export default function AllPurchasesScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-      
+
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => router.back()}
         >
           <Ionicons name="arrow-back" size={24} color={Colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>All Purchases</Text>
-        
       </View>
 
       <Animated.View
@@ -181,7 +196,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray100,
     justifyContent: "center",
     alignItems: "center",
-    right :100
+    right: 100,
   },
   headerTitle: {
     fontSize: 18,
