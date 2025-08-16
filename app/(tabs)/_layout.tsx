@@ -44,9 +44,9 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="TransactionsScreen"
+        name="AccessScreen"
         options={{
-          title: "Transactions",
+          title: "Access",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="receipt" size={size} color={color} />
           ),

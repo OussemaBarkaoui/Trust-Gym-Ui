@@ -187,9 +187,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   profileAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
@@ -206,8 +206,8 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   avatarImage: {
-    width: 44,
-    height: 44,
+    width: 60,
+    height: 60,
     borderRadius: 22,
   },
   avatarText: {

@@ -98,9 +98,6 @@ export default function AllPurchasesScreen() {
         </View>
       </View>
 
-      <View style={styles.chevronContainer}>
-        <Ionicons name="chevron-forward" size={20} color={Colors.textSubtle} />
-      </View>
     </TouchableOpacity>
   );
 

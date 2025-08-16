@@ -40,7 +40,7 @@ export const useMemberPurchases = () => {
     return purchases.slice(0, 4);
   };
 
-  // Calculate total spent for the current month
+  // Calculate total spent for the current month (only paid purchases)
   const getMonthlySpent = () => {
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -51,7 +51,26 @@ export const useMemberPurchases = () => {
         const purchaseDate = new Date(purchase.createdAt);
         return (
           purchaseDate.getMonth() === currentMonth &&
-          purchaseDate.getFullYear() === currentYear
+          purchaseDate.getFullYear() === currentYear &&
+          purchase.isPaid === true // Only count paid purchases
+        );
+      })
+      .reduce((total, purchase) => total + parseFloat(purchase.total), 0);
+  };
+
+  // Calculate total pending amount for the current month
+  const getMonthlyPending = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    return purchases
+      .filter((purchase) => {
+        const purchaseDate = new Date(purchase.createdAt);
+        return (
+          purchaseDate.getMonth() === currentMonth &&
+          purchaseDate.getFullYear() === currentYear &&
+          purchase.isPaid === false // Only count pending purchases
         );
       })
       .reduce((total, purchase) => total + parseFloat(purchase.total), 0);
@@ -64,5 +83,6 @@ export const useMemberPurchases = () => {
     refreshPurchases,
     getRecentPurchases,
     getMonthlySpent,
+    getMonthlyPending,
   };
 };

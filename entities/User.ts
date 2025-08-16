@@ -62,42 +62,6 @@ export interface UserProfile {
   };
 }
 
-export interface JWTPayload {
-  sub: string; // user id
-  email: string;
-  firstName: string;
-  lastName: string;
-  role?: string;
-  gymId?: string;
-  partnerId?: string;
-  iat: number;
-  exp: number;
-}
-
-export interface CreateUserRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  roleId?: string;
-  partnerId?: string;
-  gymId?: string;
-}
-
-export interface UpdateUserRequest {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  status?: Status;
-  roleId?: string;
-  partnerId?: string;
-  gymId?: string;
-}
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
 
 export interface ForgotPasswordRequest {
   email: string;

@@ -11,13 +11,14 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import {
   MemberPurchase,
   getMemberPurchaseById,
 } from "../features/purchases/api";
-import { useFadeIn, useSlideIn } from "../hooks";
+import { useFadeIn, useSlideIn, useProductImage } from "../hooks";
 import { showError } from "../utils/showMessage";
 
 export default function PurchaseDetailsScreen() {
@@ -27,6 +28,13 @@ export default function PurchaseDetailsScreen() {
 
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
+
+  // Product image hook
+  const { 
+    image: productImage, 
+    loading: imageLoading, 
+    error: imageError 
+  } = useProductImage(purchase?.product?.id);
 
   useEffect(() => {
     if (id) {
@@ -173,6 +181,27 @@ export default function PurchaseDetailsScreen() {
               <Text style={styles.cardTitle}>Product Details</Text>
             </View>
             <View style={styles.cardContent}>
+              {/* Product Image */}
+              <View style={styles.productImageContainer}>
+                {imageLoading ? (
+                  <View style={styles.imageLoadingContainer}>
+                    <ActivityIndicator size="small" color={Colors.primary} />
+                    <Text style={styles.imageLoadingText}>Loading image...</Text>
+                  </View>
+                ) : productImage ? (
+                  <Image
+                    source={{ uri: productImage.imageUrl }}
+                    style={styles.productImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View style={styles.noImageContainer}>
+                    <Ionicons name="image-outline" size={32} color={Colors.textSubtle} />
+                    <Text style={styles.noImageText}>No image available</Text>
+                  </View>
+                )}
+              </View>
+              
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Product Name</Text>
                 <Text style={styles.detailValue}>{purchase.product.name}</Text>
@@ -461,5 +490,43 @@ const styles = StyleSheet.create({
   paymentStatusText: {
     fontSize: 16,
     fontWeight: "500",
+  },
+  // Product Image Styles
+  productImageContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  productImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    backgroundColor: Colors.gray100,
+  },
+  imageLoadingContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    backgroundColor: Colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  imageLoadingText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: Colors.textSubtle,
+  },
+  noImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 12,
+    backgroundColor: Colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noImageText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: Colors.textSubtle,
+    textAlign: "center",
   },
 });

@@ -3,7 +3,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
+  Image,
   Modal,
   RefreshControl,
   SafeAreaView,
@@ -24,6 +26,7 @@ import {
   useMemberPurchases,
   useSlideIn,
   useWalletEntries,
+  useProductImage,
 } from "../../hooks";
 import { showError, showSuccess } from "../../utils/showMessage";
 
@@ -36,12 +39,103 @@ export default function WalletScreen() {
     loading: purchasesLoading,
     refreshPurchases,
     getMonthlySpent,
+    getMonthlyPending,
   } = useMemberPurchases();
   const {
     getMonthlyIncome,
     loading: entriesLoading,
     refreshEntries,
   } = useWalletEntries();
+
+  // Component for transaction item with product image
+  const TransactionItem = ({ transaction }: { transaction: any }) => {
+    const { 
+      image: productImage, 
+      loading: imageLoading, 
+      error: imageError 
+    } = useProductImage(transaction.productId);
+
+    return (
+      <TouchableOpacity
+        style={styles.transactionItem}
+        onPress={() => handleTransactionPress(transaction.id)}
+        activeOpacity={0.7}
+      >
+        {/* Product Image */}
+        <View style={styles.transactionImageContainer}>
+          {imageLoading ? (
+            <View style={styles.transactionImagePlaceholder}>
+              <ActivityIndicator size="small" color={Colors.primary} />
+            </View>
+          ) : productImage ? (
+            <Image
+              source={{ uri: productImage.imageUrl }}
+              style={styles.transactionImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={styles.transactionImagePlaceholder}>
+              <Ionicons
+                name="image-outline"
+                size={16}
+                color={Colors.textSubtle}
+              />
+            </View>
+          )}
+        </View>
+
+        <View style={styles.transactionDetails}>
+          <Text style={styles.transactionDescription}>
+            {transaction.description}
+          </Text>
+          <View style={styles.transactionMeta}>
+            <Text style={styles.transactionDate}>
+              {new Date(transaction.date).toLocaleDateString(
+                "en-US",
+                {
+                  month: "short",
+                  day: "numeric",
+                }
+              )}
+            </Text>
+            <View style={styles.paymentStatusContainer}>
+              <View
+                style={[
+                  styles.paymentStatusDot,
+                  {
+                    backgroundColor: transaction.isPaid
+                      ? Colors.success
+                      : Colors.warning,
+                  },
+                ]}
+              />
+              <Text
+                style={[
+                  styles.paymentStatusText,
+                  {
+                    color: transaction.isPaid
+                      ? Colors.success
+                      : Colors.warning,
+                  },
+                ]}
+              >
+                {transaction.isPaid ? "Paid" : "Pending"}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.transactionAmountContainer}>
+          <Text style={styles.transactionAmount}>
+            {transaction.amount.toFixed(2)}DT
+          </Text>
+          <Text style={styles.paymentMethod}>
+            {transaction.paymentMethod}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   // State for wallet operations
   const [wallet, setWallet] = useState<Wallet | null>(null);
@@ -213,6 +307,7 @@ export default function WalletScreen() {
     description: purchase.product.name,
     isPaid: purchase.isPaid,
     paymentMethod: purchase.paymentMethod,
+    productId: purchase.product.id,
   }));
 
   const handleViewAllTransactions = () => {
@@ -333,7 +428,7 @@ export default function WalletScreen() {
               {/* Recent Transactions */}
               <View style={styles.transactionsSection}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Recent Transactions</Text>
+                  <Text style={styles.sectionTitle}>Recent Purchases</Text>
                   <TouchableOpacity onPress={handleViewAllTransactions}>
                     <Text style={styles.viewAllText}>View All</Text>
                   </TouchableOpacity>
@@ -358,77 +453,10 @@ export default function WalletScreen() {
                   </View>
                 ) : (
                   recentTransactions.map((transaction) => (
-                    <TouchableOpacity
+                    <TransactionItem
                       key={transaction.id}
-                      style={styles.transactionItem}
-                      onPress={() => handleTransactionPress(transaction.id)}
-                      activeOpacity={0.7}
-                    >
-                      <View
-                        style={[
-                          styles.transactionIcon,
-                          {
-                            backgroundColor: Colors.primary + "20",
-                          },
-                        ]}
-                      >
-                        <Ionicons
-                          name="receipt"
-                          size={16}
-                          color={Colors.primary}
-                        />
-                      </View>
-
-                      <View style={styles.transactionDetails}>
-                        <Text style={styles.transactionDescription}>
-                          {transaction.description}
-                        </Text>
-                        <View style={styles.transactionMeta}>
-                          <Text style={styles.transactionDate}>
-                            {new Date(transaction.date).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
-                          </Text>
-                          <View style={styles.paymentStatusContainer}>
-                            <View
-                              style={[
-                                styles.paymentStatusDot,
-                                {
-                                  backgroundColor: transaction.isPaid
-                                    ? Colors.success
-                                    : Colors.warning,
-                                },
-                              ]}
-                            />
-                            <Text
-                              style={[
-                                styles.paymentStatusText,
-                                {
-                                  color: transaction.isPaid
-                                    ? Colors.success
-                                    : Colors.warning,
-                                },
-                              ]}
-                            >
-                              {transaction.isPaid ? "Paid" : "Pending"}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-
-                      <View style={styles.transactionAmountContainer}>
-                        <Text style={styles.transactionAmount}>
-                          {transaction.amount.toFixed(2)}DT
-                        </Text>
-                        <Text style={styles.paymentMethod}>
-                          {transaction.paymentMethod}
-                        </Text>
-                      </View>
-                    </TouchableOpacity>
+                      transaction={transaction}
+                    />
                   ))
                 )}
               </View>
@@ -473,6 +501,26 @@ export default function WalletScreen() {
                     <Text style={styles.statLabel}>OUT</Text>
                     <Text style={styles.statValue}>
                       {purchasesLoading ? "..." : getMonthlySpent().toFixed(2)}
+                      DT
+                    </Text>
+                  </View>
+
+                  <View style={styles.statItem}>
+                    <View
+                      style={[
+                        styles.statIcon,
+                        { backgroundColor: Colors.warning + "20" },
+                      ]}
+                    >
+                      <Ionicons
+                        name="hourglass-outline"
+                        size={20}
+                        color={Colors.warning}
+                      />
+                    </View>
+                    <Text style={styles.statLabel}>PENDING</Text>
+                    <Text style={styles.statValue}>
+                      {purchasesLoading ? "..." : getMonthlyPending().toFixed(2)}
                       DT
                     </Text>
                   </View>
@@ -719,8 +767,9 @@ const styles = StyleSheet.create({
     color: Colors.textSubtle,
   },
   transactionAmount: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
+    color: Colors.text,
   },
   statsSection: {
     backgroundColor: Colors.surface,
@@ -737,12 +786,14 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: "row",
-    gap: 16,
+    gap: 12,
+    flexWrap: "wrap",
   },
   statItem: {
     flex: 1,
+    minWidth: 90,
     alignItems: "center",
-    padding: 16,
+    padding: 12,
     backgroundColor: Colors.background,
     borderRadius: 12,
   },
@@ -760,7 +811,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   statValue: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "bold",
     color: Colors.text,
   },
@@ -963,5 +1014,23 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     color: Colors.textSubtle,
+  },
+  // Transaction Image Styles
+  transactionImageContainer: {
+    marginRight: 12,
+  },
+  transactionImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: Colors.gray100,
+  },
+  transactionImagePlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    backgroundColor: Colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

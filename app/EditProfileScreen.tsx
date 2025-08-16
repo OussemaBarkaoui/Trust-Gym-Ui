@@ -196,11 +196,14 @@ export default function EditProfileScreen() {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleCancel} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Profile</Text>
-        <View style={styles.headerButton} />
+        <View style={styles.headerRight} />
       </View>
 
       <KeyboardAvoidingView
@@ -444,6 +447,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.gray100,
     marginBottom: 20,
   },
+  headerRight: {
+    width: 40,
+  },
   avatarContainer: {
     width: 100,
     height: 100,
@@ -495,6 +501,14 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 25,
     paddingHorizontal: 20,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
   },
   sectionHeader: {
     flexDirection: "row",
