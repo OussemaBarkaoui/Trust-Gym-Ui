@@ -1,6 +1,6 @@
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.4:3000/api/product"; // Adjust the base URL as needed
+const API_BASE_URL = "http://192.168.137.1:3000/api/product"; // Adjust the base URL as needed
 
 // Function to get auth headers
 const getAuthHeaders = () => {
@@ -26,10 +26,12 @@ export interface ProductImageResponse {
   data: ProductImage;
 }
 
-export const getProductImageById = async (id: string): Promise<ProductImage> => {
+export const getProductImageById = async (
+  id: string
+): Promise<ProductImage> => {
   try {
     console.log("Fetching product image for ID:", id);
-    
+
     const response = await fetch(`${API_BASE_URL}/image/${id}`, {
       method: "GET",
       headers: getAuthHeaders(),
@@ -45,7 +47,7 @@ export const getProductImageById = async (id: string): Promise<ProductImage> => 
 
     const responseData: ProductImageResponse = await response.json();
     console.log("Product image response data:", responseData);
-    
+
     // Extract the actual image data from the response
     return responseData.data;
   } catch (error) {

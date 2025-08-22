@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/Colors";
+import { useSession } from "@/contexts/SessionContext";
 import { Access } from "@/entities/Access";
 import { useAccessHistory, useFadeIn, useSlideIn } from "@/hooks";
-import { useSession } from "@/contexts/SessionContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
-  FlatList,
   RefreshControl,
   SafeAreaView,
   ScrollView,
@@ -19,7 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import QRCode from 'react-native-qrcode-svg';
+import QRCode from "react-native-qrcode-svg";
 
 export default function AccessScreen() {
   const { accessHistory, loading, totalItems, refreshAccessHistory } =
@@ -36,7 +35,9 @@ export default function AccessScreen() {
     }
     // If no access history, generate a default cardId based on user ID
     // In a real app, this should come from the member profile
-    return session.user?.id ? `CARD-${session.user.id.slice(-8).toUpperCase()}` : "CARD-DEFAULT";
+    return session.user?.id
+      ? `CARD-${session.user.id.slice(-8).toUpperCase()}`
+      : "CARD-DEFAULT";
   };
 
   const cardId = getCardId();
@@ -44,7 +45,8 @@ export default function AccessScreen() {
   const showQRCodeInfo = () => {
     Alert.alert(
       "QR Code Access",
-      "Show this QR code to the gym scanner to gain access. Your card ID is: " + cardId,
+      "Show this QR code to the gym scanner to gain access. Your card ID is: " +
+        cardId,
       [{ text: "OK" }]
     );
   };
@@ -52,25 +54,25 @@ export default function AccessScreen() {
   const formatDate = (dateValue: Date | string) => {
     try {
       let date: Date;
-      
+
       if (dateValue instanceof Date) {
         date = dateValue;
-      } else if (typeof dateValue === 'string') {
-        if (dateValue.includes(' ')) {
+      } else if (typeof dateValue === "string") {
+        if (dateValue.includes(" ")) {
           // If it's a dateTime format like "2025-08-15 07:00:00"
           date = new Date(dateValue);
         } else {
           // If it's just a date like "2025-08-15"
-          date = new Date(dateValue + 'T00:00:00');
+          date = new Date(dateValue + "T00:00:00");
         }
       } else {
         return "Invalid Date";
       }
-      
+
       if (isNaN(date.getTime())) {
         return "Invalid Date";
       }
-      
+
       return date.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -85,23 +87,23 @@ export default function AccessScreen() {
   const formatTime = (timeString: string, dateTimeValue?: Date | string) => {
     try {
       let date: Date;
-      
+
       if (dateTimeValue instanceof Date) {
         date = dateTimeValue;
-      } else if (typeof dateTimeValue === 'string') {
+      } else if (typeof dateTimeValue === "string") {
         date = new Date(dateTimeValue);
-      } else if (timeString.includes(':')) {
+      } else if (timeString.includes(":")) {
         // If timeString is like "07:00", create a date with today and that time
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split("T")[0];
         date = new Date(`${today}T${timeString}:00`);
       } else {
         return timeString; // Return as is if can't parse
       }
-      
+
       if (isNaN(date.getTime())) {
         return timeString;
       }
-      
+
       return date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
@@ -123,71 +125,69 @@ export default function AccessScreen() {
       date: item.date,
       time: item.time,
       dateTime: item.dateTime,
-      accessType: item.accessType
+      accessType: item.accessType,
     });
-    
-    return (
-    <TouchableOpacity 
-      style={styles.accessItem}
-      onPress={() => handleAccessPress(item)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.accessHeader}>
-        <View style={styles.accessInfo}>
-          <View style={styles.accessTypeContainer}>
-            <View
-              style={[
-                styles.accessTypeIcon,
-                {
-                  backgroundColor:
-                    item.accessType === "ENTRY"
-                      ? Colors.success + "20"
-                      : Colors.error + "20",
-                },
-              ]}
-            >
-              <Ionicons
-                name={item.accessType === "ENTRY" ? "enter" : "exit"}
-                size={16}
-                color={item.accessType === "ENTRY" ? Colors.success : Colors.error}
-              />
-            </View>
-            <View>
-              <Text style={styles.accessType}>{item.accessType}</Text>
-              <Text style={styles.accessDate}>
-                {formatDate(item.dateTime || item.date)}
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.accessTime}>
-            {formatTime(item.time, item.dateTime)}
-          </Text>
-        </View>
-      </View>
 
-      <View style={styles.accessDetails}>
-        <View style={styles.detailItem}>
-          <Ionicons
-            name="card-outline"
-            size={14}
-            color={Colors.textSubtle}
-          />
-          <Text style={styles.detailText} numberOfLines={1}>
-            Card: {item.cardId}
-          </Text>
+    return (
+      <TouchableOpacity
+        style={styles.accessItem}
+        onPress={() => handleAccessPress(item)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.accessHeader}>
+          <View style={styles.accessInfo}>
+            <View style={styles.accessTypeContainer}>
+              <View
+                style={[
+                  styles.accessTypeIcon,
+                  {
+                    backgroundColor:
+                      item.accessType === "ENTRY"
+                        ? Colors.success + "20"
+                        : Colors.error + "20",
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={item.accessType === "ENTRY" ? "enter" : "exit"}
+                  size={16}
+                  color={
+                    item.accessType === "ENTRY" ? Colors.success : Colors.error
+                  }
+                />
+              </View>
+              <View>
+                <Text style={styles.accessType}>{item.accessType}</Text>
+                <Text style={styles.accessDate}>
+                  {formatDate(item.dateTime || item.date)}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.accessTime}>
+              {formatTime(item.time, item.dateTime)}
+            </Text>
+          </View>
         </View>
-        <View style={styles.detailItem}>
-          <Ionicons 
-            name={item.isAuthorized ? "checkmark-circle" : "close-circle"}
-            size={14} 
-            color={item.isAuthorized ? Colors.success : Colors.error} 
-          />
-          <Text style={styles.detailText}>
-            {item.isAuthorized ? "Authorized" : "Unauthorized"}
-          </Text>
+
+        <View style={styles.accessDetails}>
+          <View style={styles.detailItem}>
+            <Ionicons name="card-outline" size={14} color={Colors.textSubtle} />
+            <Text style={styles.detailText} numberOfLines={1}>
+              Card: {item.cardId}
+            </Text>
+          </View>
+          <View style={styles.detailItem}>
+            <Ionicons
+              name={item.isAuthorized ? "checkmark-circle" : "close-circle"}
+              size={14}
+              color={item.isAuthorized ? Colors.success : Colors.error}
+            />
+            <Text style={styles.detailText}>
+              {item.isAuthorized ? "Authorized" : "Unauthorized"}
+            </Text>
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
     );
   };
 
@@ -196,7 +196,8 @@ export default function AccessScreen() {
       <Ionicons name="time-outline" size={64} color={Colors.textSubtle} />
       <Text style={styles.emptyTitle}>No Access History</Text>
       <Text style={styles.emptyDescription}>
-        Your gym access history will appear here when you start visiting the gym.
+        Your gym access history will appear here when you start visiting the
+        gym.
       </Text>
     </View>
   );
@@ -217,79 +218,73 @@ export default function AccessScreen() {
           <Text style={styles.headerTitle}>Access History</Text>
         </View>
 
-      <Animated.View
-        style={[
-          styles.content,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          },
-        ]}
-      >
-        {loading ? (
-          renderLoadingState()
-        ) : (
-          <ScrollView
-            style={styles.scrollContainer}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            refreshControl={
-              <RefreshControl
-                refreshing={loading}
-                onRefresh={refreshAccessHistory}
-                colors={[Colors.primary]}
-                tintColor={Colors.primary}
-              />
-            }
-          >
-            {/* QR Code Access Card */}
-            <View style={styles.qrContainer}>
-              <View style={styles.qrCard}>
-                <View style={styles.qrHeader}>
-                  <Ionicons name="qr-code" size={24} color={Colors.primary} />
-                  <Text style={styles.qrTitle}>Access QR Code</Text>
-                </View>
-                
-                <TouchableOpacity 
-                  style={styles.qrCodeContainer}
-                  onPress={showQRCodeInfo}
-                  activeOpacity={0.8}
-                >
-                  <QRCode
-                    value={cardId}
-                    size={120}
-                    color={Colors.text}
-                    backgroundColor={Colors.white}
-                  />
-                </TouchableOpacity>
-                
-                <View style={styles.cardInfo}>
-                  <Text style={styles.cardLabel}>Card ID</Text>
-                  <Text style={styles.cardValue}>{cardId}</Text>
-                  <Text style={styles.cardInstructions}>
-                    Show this QR code to access the gym
-                  </Text>
+        <Animated.View
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
+          {loading ? (
+            renderLoadingState()
+          ) : (
+            <ScrollView
+              style={styles.scrollContainer}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={refreshAccessHistory}
+                  colors={[Colors.primary]}
+                  tintColor={Colors.primary}
+                />
+              }
+            >
+              {/* QR Code Access Card */}
+              <View style={styles.qrContainer}>
+                <View style={styles.qrCard}>
+                  <View style={styles.qrHeader}>
+                    <Ionicons name="qr-code" size={24} color={Colors.primary} />
+                    <Text style={styles.qrTitle}>Access QR Code</Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.qrCodeContainer}
+                    onPress={showQRCodeInfo}
+                    activeOpacity={0.8}
+                  >
+                    <QRCode
+                      value={cardId}
+                      size={120}
+                      color={Colors.text}
+                      backgroundColor={Colors.white}
+                    />
+                  </TouchableOpacity>
+
+                  <View style={styles.cardInfo}>
+                    <Text style={styles.cardLabel}>Card ID</Text>
+                    <Text style={styles.cardValue}>{cardId}</Text>
+                    <Text style={styles.cardInstructions}>
+                      Show this QR code to access the gym
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
 
-            {/* Access History Section */}
-            <View style={styles.historySection}>
-             
-              
-              {accessHistory.length === 0 ? (
-                renderEmptyState()
-              ) : (
-                accessHistory.map((item) => (
-                  <View key={item.id}>
-                    {renderAccessItem({ item })}
-                  </View>
-                ))
-              )}
-            </View>
-          </ScrollView>
-        )}
-      </Animated.View>
+              {/* Access History Section */}
+              <View style={styles.historySection}>
+                {accessHistory.length === 0
+                  ? renderEmptyState()
+                  : accessHistory.map((item) => (
+                      <View key={item.id}>{renderAccessItem({ item })}</View>
+                    ))}
+              </View>
+            </ScrollView>
+          )}
+        </Animated.View>
       </SafeAreaView>
     </View>
   );

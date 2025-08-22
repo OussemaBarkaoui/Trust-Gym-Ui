@@ -1,6 +1,6 @@
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.4:3000/api/member-purchase";
+const API_BASE_URL = "http://192.168.137.1:3000/api/member-purchase";
 
 // Function to get auth headers
 const getAuthHeaders = () => {

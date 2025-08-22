@@ -78,7 +78,7 @@ export default function LoginScreen() {
             <Button
               title="Forgot password?"
               onPress={handleForgotPassword}
-              variant="text"
+              variant="textBlack"
               size="small"
               disabled={isLoading}
               style={styles.forgotButton}
@@ -88,6 +88,7 @@ export default function LoginScreen() {
           <Button
             title="Login"
             onPress={handleLogin}
+            variant="info"
             disabled={isDisabled}
             loading={isLoading}
           />

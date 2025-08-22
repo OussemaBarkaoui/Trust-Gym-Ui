@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -6,20 +6,24 @@ import {
   Platform,
   ViewStyle,
   TextStyle,
+  ActivityIndicator,
 } from 'react-native';
+import { Colors } from '@/constants/Colors';
+import type { ButtonVariant, ButtonSize } from '@/types/common';
 
 interface ButtonProps {
   title: string;
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'text';
-  size?: 'small' | 'medium' | 'large';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  testID?: string;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button = memo<ButtonProps>(({
   title,
   onPress,
   disabled = false,
@@ -28,25 +32,25 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'large',
   style,
   textStyle,
+  testID,
 }) => {
   const isDisabled = disabled || loading;
-  const displayTitle = loading ? 'Loading...' : title;
-
-  const buttonStyle = [
+  
+  const buttonStyle = useMemo(() => [
     styles.base,
     styles[variant],
     styles[size],
     isDisabled && styles.disabled,
     style,
-  ];
+  ], [variant, size, isDisabled, style]);
 
-  const buttonTextStyle = [
+  const buttonTextStyle = useMemo(() => [
     styles.baseText,
-    styles[`${variant}Text`],
-    styles[`${size}Text`],
+    styles[`${variant}Text` as keyof typeof styles],
+    styles[`${size}Text` as keyof typeof styles],
     isDisabled && styles.disabledText,
     textStyle,
-  ];
+  ], [variant, size, isDisabled, textStyle]);
 
   return (
     <TouchableOpacity
@@ -54,11 +58,29 @@ export const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={isDisabled}
       activeOpacity={0.8}
+      testID={testID}
     >
-      <Text style={buttonTextStyle}>{displayTitle}</Text>
+      {loading ? (
+        <ActivityIndicator 
+          size="small" 
+          color={
+            variant === 'primary' ? Colors.white : 
+            variant === 'info' ? Colors.white :
+            variant === 'black' ? Colors.white :
+            variant === 'text' ? Colors.primary :
+            variant === 'textBlack' ? '#000000' :
+            variant === 'outline' ? Colors.primary :
+            Colors.primary
+          } 
+        />
+      ) : (
+        <Text style={buttonTextStyle}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
-};
+});
+
+Button.displayName = 'Button';
 
 const styles = StyleSheet.create({
   base: {
@@ -67,7 +89,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: Colors.black,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
@@ -78,15 +100,36 @@ const styles = StyleSheet.create({
     }),
   },
   primary: {
-    backgroundColor: '#015ACD',
+    backgroundColor: Colors.primary,
+  },
+  info: {
+    backgroundColor: '#007AFF', // Blue color
   },
   secondary: {
-    backgroundColor: '#2A4E62',
+    backgroundColor: Colors.primaryDark,
   },
   text: {
     backgroundColor: 'transparent',
     shadowOpacity: 0,
     elevation: 0,
+  },
+  textBlack: {
+    backgroundColor: 'transparent',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  black: {
+    backgroundColor: '#000000', // Black color
+  },
+  outline: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  danger: {
+    backgroundColor: Colors.error,
   },
   small: {
     height: 36,
@@ -102,7 +145,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   disabled: {
-    backgroundColor: '#B0B0B0',
+    backgroundColor: Colors.gray400,
+    borderColor: Colors.gray400,
     ...Platform.select({
       ios: {
         shadowOpacity: 0,
@@ -113,17 +157,32 @@ const styles = StyleSheet.create({
     }),
   },
   baseText: {
-    fontWeight: 'bold',
+    fontWeight: '600',
     textAlign: 'center',
   },
   primaryText: {
-    color: '#fff',
+    color: Colors.primaryDark,
+  },
+  infoText: {
+    color: Colors.white,
   },
   secondaryText: {
-    color: '#fff',
+    color: Colors.white,
   },
   textText: {
-    color: '#2A4E62',
+    color: Colors.primary,
+  },
+  textBlackText: {
+    color: '#000000',
+  },
+  blackText: {
+    color: Colors.white,
+  },
+  outlineText: {
+    color: Colors.primary,
+  },
+  dangerText: {
+    color: Colors.white,
   },
   smallText: {
     fontSize: 14,
@@ -135,6 +194,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   disabledText: {
-    color: '#666',
+    color: '#000000',
   },
 });

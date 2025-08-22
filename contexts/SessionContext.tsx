@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { LoginResponse, UserProfile } from "../entities/User";
 import { SessionManager, SessionState } from "../services/SessionManager";
 
@@ -14,75 +21,109 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [session, setSession] = useState<SessionState>({
-    isAuthenticated: false,
-    user: null,
-    accessToken: null,
-    refreshToken: null,
-    isLoading: true,
-  });
+interface SessionProviderProps {
+  children: React.ReactNode;
+}
 
-  const sessionManager = SessionManager.getInstance();
-
-  useEffect(() => {
-    sessionManager.initializeSession();
-
-    const unsubscribe = sessionManager.subscribe((newState) => {
-      setSession(newState);
+export const SessionProvider = React.memo<SessionProviderProps>(
+  ({ children }) => {
+    const [session, setSession] = useState<SessionState>({
+      isAuthenticated: false,
+      user: null,
+      accessToken: null,
+      refreshToken: null,
+      isLoading: true,
     });
 
-    return unsubscribe;
-  }, []);
+    const sessionManager = useMemo(() => SessionManager.getInstance(), []);
 
-  const login = async (
-    loginResponse: LoginResponse,
-    rememberMe: boolean = false
-  ) => {
-    await sessionManager.login(loginResponse, rememberMe);
-  };
+    useEffect(() => {
+      // Initialize session on mount
+      sessionManager.initializeSession();
 
-  const logout = async () => {
-    await sessionManager.logout();
-  };
+      // Subscribe to session changes
+      const unsubscribe = sessionManager.subscribe((newState) => {
+        setSession(newState);
+      });
 
-  const refreshToken = async (newToken: string) => {
-    await sessionManager.refreshAccessToken(newToken);
-  };
+      return unsubscribe;
+    }, [sessionManager]);
 
-  const updateUserProfile = async (user: UserProfile) => {
-    await sessionManager.updateUserProfile(user);
-  };
+    // Memoize context methods to prevent unnecessary re-renders
+    const login = useCallback(
+      async (loginResponse: LoginResponse, rememberMe: boolean = false) => {
+        await sessionManager.login(loginResponse, rememberMe);
+      },
+      [sessionManager]
+    );
 
-  const getSavedEmail = async () => {
-    return await sessionManager.getSavedEmail();
-  };
+    const logout = useCallback(async () => {
+      await sessionManager.logout();
+    }, [sessionManager]);
 
-  const isRememberMeEnabled = async () => {
-    return await sessionManager.isRememberMeEnabled();
-  };
+    const refreshToken = useCallback(
+      async (newToken: string) => {
+        await sessionManager.refreshToken(newToken);
+      },
+      [sessionManager]
+    );
 
-  const value: SessionContextType = {
-    session,
-    login,
-    logout,
-    refreshToken,
-    updateUserProfile,
-    getSavedEmail,
-    isRememberMeEnabled,
-  };
+    const updateUserProfile = useCallback(
+      async (user: UserProfile) => {
+        await sessionManager.updateUserProfile(user);
+      },
+      [sessionManager]
+    );
 
-  return (
-    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
-  );
-};
+    const getSavedEmail = useCallback(async () => {
+      return await sessionManager.getSavedEmail();
+    }, [sessionManager]);
 
+    const isRememberMeEnabled = useCallback(async () => {
+      return await sessionManager.isRememberMeEnabled();
+    }, [sessionManager]);
+
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo<SessionContextType>(
+      () => ({
+        session,
+        login,
+        logout,
+        refreshToken,
+        updateUserProfile,
+        getSavedEmail,
+        isRememberMeEnabled,
+      }),
+      [
+        session,
+        login,
+        logout,
+        refreshToken,
+        updateUserProfile,
+        getSavedEmail,
+        isRememberMeEnabled,
+      ]
+    );
+
+    return (
+      <SessionContext.Provider value={contextValue}>
+        {children}
+      </SessionContext.Provider>
+    );
+  }
+);
+
+SessionProvider.displayName = "SessionProvider";
+
+/**
+ * Hook to access session context with error handling
+ */
 export const useSession = (): SessionContextType => {
   const context = useContext(SessionContext);
-  if (!context) {
+
+  if (context === undefined) {
     throw new Error("useSession must be used within a SessionProvider");
   }
+
   return context;
 };

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import {
   Animated,
@@ -7,15 +8,15 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import {
-  AppHeader,
-  QuickActions,
-  QuickStats,
-  SubscriptionCard,
-} from "../../components/ui";
+import { AppHeader, QuickActions, SubscriptionCard } from "../../components/ui";
 import { Colors } from "../../constants/Colors";
 import { useSession } from "../../contexts/SessionContext";
-import { useFadeIn, useSlideIn, useSubscription } from "../../hooks";
+import {
+  useFadeIn,
+  useMemberSubscriptions,
+  useSlideIn,
+  useSubscription,
+} from "../../hooks";
 import { showMessage } from "../../utils/showMessage";
 
 export default function DashBoardScreen() {
@@ -33,6 +34,16 @@ export default function DashBoardScreen() {
     checkIn,
     getQuickActions,
   } = useSubscription();
+
+  const {
+    subscriptions,
+    currentSubscription,
+    loading: subscriptionsLoading,
+    error: subscriptionsError,
+    refreshSubscriptions,
+    getSubscriptionStatus,
+    getDaysRemaining,
+  } = useMemberSubscriptions();
 
   const handleRenewSubscription = async () => {
     const result = await renewSubscription();
@@ -59,6 +70,10 @@ export default function DashBoardScreen() {
       message: result.message,
       type: result.success ? "success" : "error",
     });
+  };
+
+  const handleSubscriptionPress = () => {
+    router.push("/SubscriptionDetailsScreen");
   };
 
   const getGreeting = () => {
@@ -103,25 +118,14 @@ export default function DashBoardScreen() {
           bounces={false}
           overScrollMode="never"
         >
-          {/* Quick Stats */}
-          <View style={styles.section}>
-            <QuickStats
-              checkedInToday={userStats.checkedInToday}
-              workoutsThisWeek={userStats.workoutsThisWeek}
-              lastWorkout={userStats.lastWorkout}
-              onCheckIn={handleCheckIn}
-            />
-          </View>
-
-          {/* Subscription Card */}
+          {/* Current Subscription */}
           <View style={styles.section}>
             <SubscriptionCard
-              planName={subscription.planName}
-              status={subscription.status}
-              expiryDate={subscription.expiryDate}
-              daysRemaining={subscription.daysRemaining}
-              onRenew={handleRenewSubscription}
-              onUpgrade={handleUpgradeSubscription}
+              subscription={currentSubscription}
+              loading={subscriptionsLoading}
+              onPress={handleSubscriptionPress}
+              getSubscriptionStatus={getSubscriptionStatus}
+              getDaysRemaining={getDaysRemaining}
             />
           </View>
 

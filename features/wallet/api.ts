@@ -2,8 +2,8 @@ import { Wallet } from "@/entities/Wallet";
 import { WalletEntry } from "@/entities/WalletEntry";
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.4:3000/api/wallet"; // Add your API base URL here
-const API_BASE_URL_WALLET_ENTRY = "http://192.168.1.4:3000/api/member";
+const API_BASE_URL = "http://192.168.137.1:3000/api/wallet"; // Add your API base URL here
+const API_BASE_URL_WALLET_ENTRY = "http://192.168.137.1:3000/api/member";
 // Function to get auth headers
 const getAuthHeaders = () => {
   const sessionManager = SessionManager.getInstance();

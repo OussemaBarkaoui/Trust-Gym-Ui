@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
+  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -11,14 +12,13 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import {
   MemberPurchase,
   getMemberPurchaseById,
 } from "../features/purchases/api";
-import { useFadeIn, useSlideIn, useProductImage } from "../hooks";
+import { useFadeIn, useProductImage, useSlideIn } from "../hooks";
 import { showError } from "../utils/showMessage";
 
 export default function PurchaseDetailsScreen() {
@@ -30,10 +30,10 @@ export default function PurchaseDetailsScreen() {
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
 
   // Product image hook
-  const { 
-    image: productImage, 
-    loading: imageLoading, 
-    error: imageError 
+  const {
+    image: productImage,
+    loading: imageLoading,
+    error: imageError,
   } = useProductImage(purchase?.product?.id);
 
   useEffect(() => {
@@ -186,7 +186,9 @@ export default function PurchaseDetailsScreen() {
                 {imageLoading ? (
                   <View style={styles.imageLoadingContainer}>
                     <ActivityIndicator size="small" color={Colors.primary} />
-                    <Text style={styles.imageLoadingText}>Loading image...</Text>
+                    <Text style={styles.imageLoadingText}>
+                      Loading image...
+                    </Text>
                   </View>
                 ) : productImage ? (
                   <Image
@@ -196,12 +198,16 @@ export default function PurchaseDetailsScreen() {
                   />
                 ) : (
                   <View style={styles.noImageContainer}>
-                    <Ionicons name="image-outline" size={32} color={Colors.textSubtle} />
+                    <Ionicons
+                      name="image-outline"
+                      size={32}
+                      color={Colors.textSubtle}
+                    />
                     <Text style={styles.noImageText}>No image available</Text>
                   </View>
                 )}
               </View>
-              
+
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Product Name</Text>
                 <Text style={styles.detailValue}>{purchase.product.name}</Text>

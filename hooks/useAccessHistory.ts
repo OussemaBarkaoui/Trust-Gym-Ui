@@ -13,9 +13,9 @@ export const useAccessHistory = () => {
       setLoading(true);
       setError(null);
       console.log("Fetching access history...");
-      
+
       const response = await getMemberAccessHistory();
-      
+
       console.log("Access history fetched:", response);
       setAccessHistory(response.data);
       setTotalItems(response.totalItems);

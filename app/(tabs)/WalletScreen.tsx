@@ -24,9 +24,9 @@ import { createWallet, getWallet } from "../../features/wallet/api";
 import {
   useFadeIn,
   useMemberPurchases,
+  useProductImage,
   useSlideIn,
   useWalletEntries,
-  useProductImage,
 } from "../../hooks";
 import { showError, showSuccess } from "../../utils/showMessage";
 
@@ -49,10 +49,10 @@ export default function WalletScreen() {
 
   // Component for transaction item with product image
   const TransactionItem = ({ transaction }: { transaction: any }) => {
-    const { 
-      image: productImage, 
-      loading: imageLoading, 
-      error: imageError 
+    const {
+      image: productImage,
+      loading: imageLoading,
+      error: imageError,
     } = useProductImage(transaction.productId);
 
     return (
@@ -90,13 +90,10 @@ export default function WalletScreen() {
           </Text>
           <View style={styles.transactionMeta}>
             <Text style={styles.transactionDate}>
-              {new Date(transaction.date).toLocaleDateString(
-                "en-US",
-                {
-                  month: "short",
-                  day: "numeric",
-                }
-              )}
+              {new Date(transaction.date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
             </Text>
             <View style={styles.paymentStatusContainer}>
               <View
@@ -113,9 +110,7 @@ export default function WalletScreen() {
                 style={[
                   styles.paymentStatusText,
                   {
-                    color: transaction.isPaid
-                      ? Colors.success
-                      : Colors.warning,
+                    color: transaction.isPaid ? Colors.success : Colors.warning,
                   },
                 ]}
               >
@@ -129,9 +124,7 @@ export default function WalletScreen() {
           <Text style={styles.transactionAmount}>
             {transaction.amount.toFixed(2)}DT
           </Text>
-          <Text style={styles.paymentMethod}>
-            {transaction.paymentMethod}
-          </Text>
+          <Text style={styles.paymentMethod}>{transaction.paymentMethod}</Text>
         </View>
       </TouchableOpacity>
     );
@@ -520,7 +513,9 @@ export default function WalletScreen() {
                     </View>
                     <Text style={styles.statLabel}>PENDING</Text>
                     <Text style={styles.statValue}>
-                      {purchasesLoading ? "..." : getMonthlyPending().toFixed(2)}
+                      {purchasesLoading
+                        ? "..."
+                        : getMonthlyPending().toFixed(2)}
                       DT
                     </Text>
                   </View>

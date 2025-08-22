@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import { Access } from "../entities/Access";
-import { useFadeIn, useSlideIn, useAccessHistory } from "../hooks";
+import { useAccessHistory, useFadeIn, useSlideIn } from "../hooks";
 import { showError } from "../utils/showMessage";
 
 export default function AccessDetailsScreen() {
@@ -29,7 +29,7 @@ export default function AccessDetailsScreen() {
   useEffect(() => {
     if (id && accessHistory.length > 0) {
       // Find the access details from the existing data
-      const foundAccess = accessHistory.find(access => access.id === id);
+      const foundAccess = accessHistory.find((access) => access.id === id);
       if (foundAccess) {
         setAccessDetails(foundAccess);
       } else {
@@ -43,19 +43,19 @@ export default function AccessDetailsScreen() {
   const formatDate = (dateValue: Date | string) => {
     try {
       let date: Date;
-      
+
       if (dateValue instanceof Date) {
         date = dateValue;
-      } else if (typeof dateValue === 'string') {
+      } else if (typeof dateValue === "string") {
         date = new Date(dateValue);
       } else {
         return "Invalid Date";
       }
-      
+
       if (isNaN(date.getTime())) {
         return "Invalid Date";
       }
-      
+
       return date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -70,22 +70,22 @@ export default function AccessDetailsScreen() {
   const formatTime = (timeString: string, dateTimeValue?: Date | string) => {
     try {
       let date: Date;
-      
+
       if (dateTimeValue instanceof Date) {
         date = dateTimeValue;
-      } else if (typeof dateTimeValue === 'string') {
+      } else if (typeof dateTimeValue === "string") {
         date = new Date(dateTimeValue);
-      } else if (timeString.includes(':')) {
-        const today = new Date().toISOString().split('T')[0];
+      } else if (timeString.includes(":")) {
+        const today = new Date().toISOString().split("T")[0];
         date = new Date(`${today}T${timeString}:00`);
       } else {
         return timeString;
       }
-      
+
       if (isNaN(date.getTime())) {
         return timeString;
       }
-      
+
       return date.toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
@@ -99,17 +99,17 @@ export default function AccessDetailsScreen() {
   const formatDateTime = (dateTimeValue: Date | string) => {
     try {
       let date: Date;
-      
+
       if (dateTimeValue instanceof Date) {
         date = dateTimeValue;
       } else {
         date = new Date(dateTimeValue);
       }
-      
+
       if (isNaN(date.getTime())) {
         return "Invalid Date";
       }
-      
+
       return date.toLocaleString("en-US", {
         year: "numeric",
         month: "long",
@@ -211,15 +211,14 @@ export default function AccessDetailsScreen() {
                 style={[
                   styles.statusIndicator,
                   {
-                    backgroundColor: accessDetails.accessType === "ENTRY"
-                      ? Colors.success
-                      : Colors.error,
+                    backgroundColor:
+                      accessDetails.accessType === "ENTRY"
+                        ? Colors.success
+                        : Colors.error,
                   },
                 ]}
               />
-              <Text style={styles.statusText}>
-                {accessDetails.accessType}
-              </Text>
+              <Text style={styles.statusText}>{accessDetails.accessType}</Text>
             </View>
             <Text style={styles.accessId}>Access ID: {accessDetails.id}</Text>
           </View>
@@ -235,14 +234,27 @@ export default function AccessDetailsScreen() {
                 <Text style={styles.detailLabel}>Access Type</Text>
                 <View style={styles.accessTypeContainer}>
                   <Ionicons
-                    name={accessDetails.accessType === "ENTRY" ? "enter" : "exit"}
+                    name={
+                      accessDetails.accessType === "ENTRY" ? "enter" : "exit"
+                    }
                     size={16}
-                    color={accessDetails.accessType === "ENTRY" ? Colors.success : Colors.error}
+                    color={
+                      accessDetails.accessType === "ENTRY"
+                        ? Colors.success
+                        : Colors.error
+                    }
                   />
-                  <Text style={[
-                    styles.detailValue,
-                    { color: accessDetails.accessType === "ENTRY" ? Colors.success : Colors.error }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.detailValue,
+                      {
+                        color:
+                          accessDetails.accessType === "ENTRY"
+                            ? Colors.success
+                            : Colors.error,
+                      },
+                    ]}
+                  >
                     {accessDetails.accessType}
                   </Text>
                 </View>
@@ -271,7 +283,11 @@ export default function AccessDetailsScreen() {
           {/* Authorization Information */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Ionicons name="shield-checkmark" size={24} color={Colors.primary} />
+              <Ionicons
+                name="shield-checkmark"
+                size={24}
+                color={Colors.primary}
+              />
               <Text style={styles.cardTitle}>Authorization</Text>
             </View>
             <View style={styles.cardContent}>
@@ -279,9 +295,15 @@ export default function AccessDetailsScreen() {
                 <Text style={styles.detailLabel}>Authorization Status</Text>
                 <View style={styles.authStatusContainer}>
                   <Ionicons
-                    name={accessDetails.isAuthorized ? "checkmark-circle" : "close-circle"}
+                    name={
+                      accessDetails.isAuthorized
+                        ? "checkmark-circle"
+                        : "close-circle"
+                    }
                     size={16}
-                    color={accessDetails.isAuthorized ? Colors.success : Colors.error}
+                    color={
+                      accessDetails.isAuthorized ? Colors.success : Colors.error
+                    }
                   />
                   <Text
                     style={[
@@ -299,8 +321,6 @@ export default function AccessDetailsScreen() {
               </View>
             </View>
           </View>
-
-          
         </ScrollView>
       </Animated.View>
     </SafeAreaView>

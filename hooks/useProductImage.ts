@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { getProductImageById, ProductImage } from "@/features/products/api";
+import { useEffect, useState } from "react";
 
 export const useProductImage = (productId?: string) => {
   const [image, setImage] = useState<ProductImage | null>(null);
