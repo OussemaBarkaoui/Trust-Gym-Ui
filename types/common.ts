@@ -29,41 +29,62 @@ export interface FormState<T = Record<string, any>> {
 /**
  * Button variant types
  */
-export type ButtonVariant = 'primary' | 'secondary' | 'text' | 'outline' | 'danger' | 'info' | 'black' | 'textBlack';
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "text"
+  | "outline"
+  | "danger"
+  | "info"
+  | "black"
+  | "textBlack";
 
 /**
  * Button size types
  */
-export type ButtonSize = 'small' | 'medium' | 'large';
+export type ButtonSize = "small" | "medium" | "large";
 
 /**
  * Input types
  */
-export type InputType = 'text' | 'email' | 'password' | 'phone' | 'number';
+export type InputType = "text" | "email" | "password" | "phone" | "number";
 
 /**
  * Message types for notifications
  */
-export type MessageType = 'success' | 'error' | 'warning' | 'info';
+export type MessageType = "success" | "error" | "warning" | "info";
 
 /**
  * Animation directions
  */
-export type AnimationDirection = 'up' | 'down' | 'left' | 'right';
+export type AnimationDirection = "up" | "down" | "left" | "right";
 
 /**
  * Status types for subscriptions/memberships
  */
-export type StatusType = 'active' | 'expired' | 'upcoming' | 'inactive';
+export type StatusType = "active" | "expired" | "upcoming" | "inactive";
 
 /**
  * Theme color names
  */
-export type ColorName = 
-  | 'primary' | 'primaryDark' | 'background' | 'surface'
-  | 'text' | 'textDisabled' | 'textSubtle'
-  | 'error' | 'success' | 'warning' | 'info'
-  | 'white' | 'black' | 'active' | 'inactive' | 'expired' | 'expiring';
+export type ColorName =
+  | "primary"
+  | "primaryDark"
+  | "background"
+  | "surface"
+  | "text"
+  | "textDisabled"
+  | "textSubtle"
+  | "error"
+  | "success"
+  | "warning"
+  | "info"
+  | "white"
+  | "black"
+  | "active"
+  | "inactive"
+  | "expired"
+  | "expiring";
 
 /**
  * Generic callback function

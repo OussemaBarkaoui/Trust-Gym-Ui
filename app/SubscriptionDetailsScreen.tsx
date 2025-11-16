@@ -1,4 +1,6 @@
-import React, { memo, useMemo } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { memo, useMemo } from "react";
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -8,14 +10,12 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
 
-import { Colors } from '@/constants/Colors';
-import { useMemberSubscriptions, useSubscriptionUtils } from '@/hooks';
-import { StatusBadge, PaymentDetails } from '@/components/subscription';
-import type { MemberSubscription } from '@/entities/MemberSubscription';
+import { PaymentDetails, StatusBadge } from "@/components/subscription";
+import { Colors } from "@/constants/Colors";
+import type { MemberSubscription } from "@/entities/MemberSubscription";
+import { useMemberSubscriptions, useSubscriptionUtils } from "@/hooks";
 
 interface SubscriptionHeaderProps {
   onBackPress: () => void;
@@ -31,7 +31,7 @@ const SubscriptionHeader = memo<SubscriptionHeaderProps>(({ onBackPress }) => (
   </View>
 ));
 
-SubscriptionHeader.displayName = 'SubscriptionHeader';
+SubscriptionHeader.displayName = "SubscriptionHeader";
 
 interface LoadingStateProps {
   onBackPress: () => void;
@@ -48,7 +48,7 @@ const LoadingState = memo<LoadingStateProps>(({ onBackPress }) => (
   </SafeAreaView>
 ));
 
-LoadingState.displayName = 'LoadingState';
+LoadingState.displayName = "LoadingState";
 
 interface EmptyStateProps {
   onBackPress: () => void;
@@ -72,7 +72,7 @@ const EmptyState = memo<EmptyStateProps>(({ onBackPress, onRefresh }) => (
   </SafeAreaView>
 ));
 
-EmptyState.displayName = 'EmptyState';
+EmptyState.displayName = "EmptyState";
 
 export default function SubscriptionDetailsScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -84,7 +84,7 @@ export default function SubscriptionDetailsScreen() {
     getSubscriptionStatus,
     getDaysRemaining,
   } = useMemberSubscriptions();
-  
+
   const {
     formatDate,
     formatAmount,
@@ -95,32 +95,39 @@ export default function SubscriptionDetailsScreen() {
   // Memoize subscription finding logic
   const subscription = useMemo((): MemberSubscription | undefined => {
     if (!subscriptions.length) return undefined;
-    
+
     if (id) {
       return subscriptions.find((sub) => sub.id === id);
     }
-    
+
     // Find current active or upcoming subscription
-    return subscriptions.find((sub) => {
-      const status = getSubscriptionStatus(sub);
-      return status === 'active' || status === 'upcoming';
-    }) || subscriptions[0];
+    return (
+      subscriptions.find((sub) => {
+        const status = getSubscriptionStatus(sub);
+        return status === "active" || status === "upcoming";
+      }) || subscriptions[0]
+    );
   }, [subscriptions, id, getSubscriptionStatus]);
 
   // Memoize subscription calculations
   const subscriptionData = useMemo(() => {
     if (!subscription) return null;
-    
+
     const status = utilsGetSubscriptionStatus(subscription);
     const daysRemaining = utilsGetDaysRemaining(subscription);
-    
+
     return {
       status,
       daysRemaining,
       formattedStartDate: formatDate(subscription.startDate),
       formattedEndDate: formatDate(subscription.endDate),
     };
-  }, [subscription, utilsGetSubscriptionStatus, utilsGetDaysRemaining, formatDate]);
+  }, [
+    subscription,
+    utilsGetSubscriptionStatus,
+    utilsGetDaysRemaining,
+    formatDate,
+  ]);
 
   const handleBackPress = () => {
     router.back();
@@ -135,18 +142,22 @@ export default function SubscriptionDetailsScreen() {
   }
 
   if (!subscription) {
-    return <EmptyState onBackPress={handleBackPress} onRefresh={handleRefresh} />;
+    return (
+      <EmptyState onBackPress={handleBackPress} onRefresh={handleRefresh} />
+    );
   }
 
   if (!subscriptionData) {
-    return <EmptyState onBackPress={handleBackPress} onRefresh={handleRefresh} />;
+    return (
+      <EmptyState onBackPress={handleBackPress} onRefresh={handleRefresh} />
+    );
   }
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
       <SubscriptionHeader onBackPress={handleBackPress} />
-      
+
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Subscription Header */}
         <View style={styles.subscriptionHeader}>
@@ -154,9 +165,9 @@ export default function SubscriptionDetailsScreen() {
             <Text style={styles.planName}>
               {subscription.gymSubscription.name}
             </Text>
-            <StatusBadge 
-              status={subscriptionData.status} 
-              daysRemaining={subscriptionData.daysRemaining} 
+            <StatusBadge
+              status={subscriptionData.status}
+              daysRemaining={subscriptionData.daysRemaining}
             />
           </View>
           <Text style={styles.gymLocation}>{subscription.gym.location}</Text>
@@ -184,14 +195,16 @@ export default function SubscriptionDetailsScreen() {
                 style={[
                   styles.detailValue,
                   {
-                    color: subscriptionData.status === 'expired' ? Colors.error : Colors.success,
+                    color:
+                      subscriptionData.status === "expired"
+                        ? Colors.error
+                        : Colors.success,
                   },
                 ]}
               >
-                {subscriptionData.status === 'expired' 
-                  ? 'Expired' 
-                  : `${subscriptionData.daysRemaining} days`
-                }
+                {subscriptionData.status === "expired"
+                  ? "Expired"
+                  : `${subscriptionData.daysRemaining} days`}
               </Text>
             </View>
           </View>
@@ -244,9 +257,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: Colors.white,
@@ -258,12 +271,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: Colors.gray100,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.text,
   },
   headerRight: {
@@ -275,9 +288,9 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: Colors.gray100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
   },
   content: {
     flex: 1,
@@ -285,8 +298,8 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     marginTop: 16,
@@ -295,13 +308,13 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   emptyTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.text,
     marginTop: 16,
     marginBottom: 8,
@@ -309,7 +322,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 14,
     color: Colors.textSubtle,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subscriptionHeader: {
     backgroundColor: Colors.white,
@@ -327,29 +340,29 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   planInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   planName: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.text,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
     flex: 1,
   },
   gymLocation: {
     fontSize: 14,
     color: Colors.textSubtle,
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
   section: {
     marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.text,
     marginBottom: 12,
   },
@@ -367,9 +380,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   detailLabel: {
@@ -379,14 +392,14 @@ const styles = StyleSheet.create({
   },
   detailValue: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.text,
     flex: 1,
-    textAlign: 'right',
+    textAlign: "right",
   },
   createdDate: {
     fontSize: 14,
     color: Colors.text,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

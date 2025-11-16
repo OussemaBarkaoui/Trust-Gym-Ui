@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { MemberSubscription } from '@/entities/MemberSubscription';
-import { getMemberSubscriptions } from '@/features/subscriptions/api';
-import type { StatusType } from '@/types/common';
+import { MemberSubscription } from "@/entities/MemberSubscription";
+import { getMemberSubscriptions } from "@/features/subscriptions/api";
+import type { StatusType } from "@/types/common";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface UseMemberSubscriptionsReturn {
   subscriptions: MemberSubscription[];
@@ -25,8 +25,9 @@ export const useMemberSubscriptions = (): UseMemberSubscriptionsReturn => {
       const data = await getMemberSubscriptions();
       setSubscriptions(data);
     } catch (err) {
-      console.error('Error fetching member subscriptions:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch subscriptions';
+      console.error("Error fetching member subscriptions:", err);
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch subscriptions";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -51,28 +52,34 @@ export const useMemberSubscriptions = (): UseMemberSubscriptionsReturn => {
   }, [subscriptions]);
 
   // Memoized utility functions
-  const getSubscriptionStatus = useCallback((subscription: MemberSubscription): StatusType => {
-    const currentDate = new Date();
-    const startDate = new Date(subscription.startDate);
-    const endDate = new Date(subscription.endDate);
+  const getSubscriptionStatus = useCallback(
+    (subscription: MemberSubscription): StatusType => {
+      const currentDate = new Date();
+      const startDate = new Date(subscription.startDate);
+      const endDate = new Date(subscription.endDate);
 
-    if (currentDate < startDate) {
-      return 'upcoming';
-    } else if (currentDate >= startDate && currentDate <= endDate) {
-      return 'active';
-    } else {
-      return 'expired';
-    }
-  }, []);
+      if (currentDate < startDate) {
+        return "upcoming";
+      } else if (currentDate >= startDate && currentDate <= endDate) {
+        return "active";
+      } else {
+        return "expired";
+      }
+    },
+    []
+  );
 
   // Get days remaining for current subscription
-  const getDaysRemaining = useCallback((subscription: MemberSubscription): number => {
-    const currentDate = new Date();
-    const endDate = new Date(subscription.endDate);
-    const timeDiff = endDate.getTime() - currentDate.getTime();
-    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    return daysDiff > 0 ? daysDiff : 0;
-  }, []);
+  const getDaysRemaining = useCallback(
+    (subscription: MemberSubscription): number => {
+      const currentDate = new Date();
+      const endDate = new Date(subscription.endDate);
+      const timeDiff = endDate.getTime() - currentDate.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      return daysDiff > 0 ? daysDiff : 0;
+    },
+    []
+  );
 
   return {
     subscriptions,

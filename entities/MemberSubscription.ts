@@ -9,7 +9,6 @@ export interface Payment {
   createdAt: string;
 }
 
-
 export interface GymSubscription {
   id: string;
   name: string;

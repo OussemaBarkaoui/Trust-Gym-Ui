@@ -1,11 +1,11 @@
-import { ParamListBase } from '@react-navigation/native';
+import { ParamListBase } from "@react-navigation/native";
 
 /**
  * Root navigation param list
  */
 export interface RootParamList extends ParamListBase {
-  '(auth)': undefined;
-  '(tabs)': undefined;
+  "(auth)": undefined;
+  "(tabs)": undefined;
   SubscriptionDetailsScreen: { id?: string };
   AccessDetailsScreen: { id?: string };
   PurchaseDetailsScreen: { id?: string };

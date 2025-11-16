@@ -1,7 +1,7 @@
-import React, { memo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { Colors } from "@/constants/Colors";
+import { Ionicons } from "@expo/vector-icons";
+import React, { memo } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface HeaderProps {
   title: string;
@@ -10,42 +10,39 @@ interface HeaderProps {
   showBackButton?: boolean;
 }
 
-export const Header = memo<HeaderProps>(({
-  title,
-  onBackPress,
-  rightComponent,
-  showBackButton = true,
-}) => (
-  <View style={styles.container}>
-    {showBackButton ? (
-      <TouchableOpacity 
-        style={styles.backButton} 
-        onPress={onBackPress}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      >
-        <Ionicons name="arrow-back" size={24} color={Colors.text} />
-      </TouchableOpacity>
-    ) : (
-      <View style={styles.spacer} />
-    )}
-    
-    <Text style={styles.title} numberOfLines={1}>
-      {title}
-    </Text>
-    
-    <View style={styles.rightContainer}>
-      {rightComponent || <View style={styles.spacer} />}
-    </View>
-  </View>
-));
+export const Header = memo<HeaderProps>(
+  ({ title, onBackPress, rightComponent, showBackButton = true }) => (
+    <View style={styles.container}>
+      {showBackButton ? (
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={onBackPress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.spacer} />
+      )}
 
-Header.displayName = 'Header';
+      <Text style={styles.title} numberOfLines={1}>
+        {title}
+      </Text>
+
+      <View style={styles.rightContainer}>
+        {rightComponent || <View style={styles.spacer} />}
+      </View>
+    </View>
+  )
+);
+
+Header.displayName = "Header";
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: Colors.white,
@@ -58,20 +55,20 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     backgroundColor: Colors.gray100,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     color: Colors.text,
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
     marginHorizontal: 16,
   },
   rightContainer: {
     minWidth: 40,
-    alignItems: 'flex-end',
+    alignItems: "flex-end",
   },
   spacer: {
     width: 40,

@@ -1,2 +1,2 @@
-export { ApiClient, apiClient } from './client';
-export * from './endpoints';
+export { ApiClient, apiClient } from "./client";
+export * from "./endpoints";

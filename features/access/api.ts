@@ -1,7 +1,7 @@
 import { Access } from "@/entities/Access";
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.137.1:3000/api/access"; // Adjust the base URL as needed
+const API_BASE_URL = "http://192.168.1.18:3000/api/access"; // Adjust the base URL as needed
 
 // Function to get auth headers
 const getAuthHeaders = () => {

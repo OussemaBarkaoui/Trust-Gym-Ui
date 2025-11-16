@@ -1,8 +1,8 @@
 import { UserProfile } from "@/entities/User";
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.137.1:3000/api/member";
-const FILES_API_BASE_URL = "http://192.168.137.1:3000/api/files";
+const API_BASE_URL = "http://192.168.1.18:3000/api/member";
+const FILES_API_BASE_URL = "http://192.168.1.18:3000/api/files";
 
 // Function to get auth headers
 const getAuthHeaders = () => {

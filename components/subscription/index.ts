@@ -1,2 +1,2 @@
-export { StatusBadge } from './StatusBadge';
-export { PaymentDetails } from './PaymentDetails';
+export { PaymentDetails } from "./PaymentDetails";
+export { StatusBadge } from "./StatusBadge";
