@@ -13,14 +13,27 @@ export const getMemberSubscriptions = async (): Promise<
   MemberSubscription[]
 > => {
   try {
+    console.log("[subscriptions] Fetching member subscriptions...");
+    
     const response = await apiClient.get<MemberSubscriptionsResponse>(
-      API_ENDPOINTS.MEMBER.SUBSCRIPTIONS
+      API_ENDPOINTS.MEMBER.SUBSCRIPTIONS,
+      { timeout: 60000 } // 60 second timeout
     );
 
-    console.log("Member subscriptions response:", response);
-    return response.data || [];
+    console.log("[subscriptions] Response received:", response);
+    
+    // Handle different response formats
+    if (Array.isArray(response)) {
+      return response;
+    }
+    
+    if (response && response.data) {
+      return Array.isArray(response.data) ? response.data : [];
+    }
+    
+    return [];
   } catch (error) {
-    console.error("Error fetching member subscriptions:", error);
+    console.error("[subscriptions] Error fetching member subscriptions:", error);
 
     // Re-throw with more specific error message
     if (error instanceof Error) {

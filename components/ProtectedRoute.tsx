@@ -16,12 +16,14 @@ export default function ProtectedRoute({
       const inAuthGroup = segments[0] === "(auth)";
 
       if (!session.isAuthenticated && !inAuthGroup) {
-        router.replace("/LoginScreen");
+        // User is not authenticated and not in auth group - redirect to login
+        router.replace("/(auth)/LoginScreen");
       } else if (session.isAuthenticated && inAuthGroup) {
+        // User is authenticated but in auth group - redirect to dashboard
         router.replace("/(tabs)/DashBoardScreen");
       }
     }
-  }, [session.isAuthenticated, session.isLoading, segments, router]);
+  }, [session.isAuthenticated, session.isLoading, segments]);
 
   return <>{children}</>;
 }

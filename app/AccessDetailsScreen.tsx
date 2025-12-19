@@ -16,6 +16,7 @@ import { Colors } from "../constants/Colors";
 import { Access } from "../entities/Access";
 import { useAccessHistory, useFadeIn, useSlideIn } from "../hooks";
 import { showError } from "../utils/showMessage";
+import { createShadow } from "@/utils/platformStyles";
 
 export default function AccessDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -392,14 +393,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 8, 4),
   },
   statusHeader: {
     flexDirection: "row",
@@ -426,14 +420,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 16,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 8, 4),
   },
   cardHeader: {
     flexDirection: "row",

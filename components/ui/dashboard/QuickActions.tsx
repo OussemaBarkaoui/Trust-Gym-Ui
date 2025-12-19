@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
+import { createShadow } from "@/utils/platformStyles";
 
 interface QuickAction {
   id: string;
@@ -52,14 +53,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 4, 3),
   },
   sectionTitle: {
     fontSize: 18,
@@ -77,14 +71,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 12,
     marginRight: 12,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    ...createShadow(Colors.black, { width: 0, height: 1 }, 0.2, 2, 2),
   },
   actionTitle: {
     color: Colors.white,

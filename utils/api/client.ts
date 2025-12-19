@@ -2,8 +2,8 @@ import { SessionManager } from "@/services/SessionManager";
 import type { ApiError, ApiRequestOptions } from "@/types/api";
 
 // Base configuration
-const API_BASE_URL = "http://192.168.1.18:3000/api";
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
+const API_BASE_URL = "http://10.58.235.215:3000/api";
+const DEFAULT_TIMEOUT = 60000; // 60 seconds (increased from 30)
 
 /**
  * Enhanced API client with error handling and authentication
@@ -115,6 +115,7 @@ export class ApiClient {
       // Lightweight request log without leaking secrets
       const hasAuth = Boolean(requestHeaders["Authorization"]);
       console.log(`[api] ${method} ${url} auth=${hasAuth}`);
+      
       const response = await fetch(url, requestInit);
 
       if (!response.ok) {
@@ -136,14 +137,18 @@ export class ApiClient {
           console.log(`[api] ok ${method} ${url} totalItems=${total}`);
         } else if (Array.isArray(arr)) {
           console.log(`[api] ok ${method} ${url} data.length=${arr.length}`);
+        } else {
+          console.log(`[api] ok ${method} ${url}`);
         }
       }
       return data;
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === "AbortError") {
-          throw new Error("Request timeout");
+          console.error(`[api] timeout ${method} ${url}`);
+          throw new Error("Request timeout - please check your connection and try again");
         }
+        console.error(`[api] error ${method} ${url}:`, error.message);
         throw error;
       }
       throw new Error("Unknown error occurred");

@@ -8,6 +8,7 @@ import {
   Text,
 } from "react-native";
 import { Colors } from "../../constants/Colors";
+import { createShadow } from "@/utils/platformStyles";
 
 interface TabBarProps {
   state: any;
@@ -140,14 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderTopColor: "#e0e0e0",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 8,
+    ...createShadow("#000", { width: 0, height: -2 }, 0.1, 4, 8),
   },
   tabBar: {
     flexDirection: "row",

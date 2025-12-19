@@ -1,8 +1,8 @@
 import { UserProfile } from "@/entities/User";
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.18:3000/api/member";
-const FILES_API_BASE_URL = "http://192.168.1.18:3000/api/files";
+const API_BASE_URL = "http://10.58.235.215:3000/api/member";
+const FILES_API_BASE_URL = "http://10.58.235.215:3000/api/files";
 
 // Function to get auth headers
 const getAuthHeaders = () => {
@@ -135,6 +135,9 @@ export const getCurrentUserProfile = async (): Promise<UserProfile> => {
 
   const result = await response.json();
 
+  console.log("Profile API response:", result);
+  console.log("MemberImage:", result.memberImage);
+
   // Transform the backend response to match UserProfile interface
   const userProfile: UserProfile = {
     id: result.id,
@@ -152,6 +155,9 @@ export const getCurrentUserProfile = async (): Promise<UserProfile> => {
     partner: result.partner,
     gym: result.gym,
   };
+
+  console.log("Transformed userProfile:", userProfile);
+  console.log("ImageUrl:", userProfile.imageUrl);
 
   return userProfile;
 };

@@ -20,6 +20,7 @@ import {
 } from "../features/purchases/api";
 import { useFadeIn, useProductImage, useSlideIn } from "../hooks";
 import { showError } from "../utils/showMessage";
+import { createShadow } from "@/utils/platformStyles";
 
 export default function PurchaseDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -279,18 +280,20 @@ export default function PurchaseDetailsScreen() {
           </View>
 
           {/* Gym Information */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="location" size={24} color={Colors.primary} />
-              <Text style={styles.cardTitle}>Gym Location</Text>
-            </View>
-            <View style={styles.cardContent}>
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Location</Text>
-                <Text style={styles.detailValue}>{purchase.gym.location}</Text>
+          {purchase.gym && (
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="location" size={24} color={Colors.primary} />
+                <Text style={styles.cardTitle}>Gym Location</Text>
+              </View>
+              <View style={styles.cardContent}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Location</Text>
+                  <Text style={styles.detailValue}>{purchase.gym.location}</Text>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* Member Information */}
           <View style={styles.card}>
@@ -302,7 +305,7 @@ export default function PurchaseDetailsScreen() {
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Name</Text>
                 <Text style={styles.detailValue}>
-                  {purchase.member.firstName} {purchase.member.lastName}
+                  {purchase.member.firstName.charAt(0).toUpperCase() + purchase.member.firstName.slice(1)} {purchase.member.lastName.charAt(0).toUpperCase() + purchase.member.lastName.slice(1)}
                 </Text>
               </View>
               <View style={styles.detailRow}>
@@ -382,14 +385,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 8, 4),
   },
   statusHeader: {
     flexDirection: "row",
@@ -416,14 +412,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 16,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 8, 4),
   },
   cardHeader: {
     flexDirection: "row",
@@ -448,11 +437,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 16,
+    gap: 12,
   },
   detailLabel: {
     fontSize: 14,
     color: Colors.textSubtle,
-    flex: 1,
+    minWidth: 80,
   },
   detailValue: {
     fontSize: 16,
@@ -460,6 +450,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
     flex: 1,
     textAlign: "right",
+    flexWrap: "wrap",
   },
   totalRow: {
     borderTopWidth: 1,

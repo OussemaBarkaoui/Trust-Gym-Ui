@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import { MemberSubscription } from "@/entities/MemberSubscription";
+import { createShadow } from "@/utils/platformStyles";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -276,14 +277,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: Colors.white,
     borderRadius: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 8, 4),
   },
   header: {
     flexDirection: "row",

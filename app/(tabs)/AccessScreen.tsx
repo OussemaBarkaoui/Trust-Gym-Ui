@@ -29,11 +29,11 @@ export default function AccessScreen() {
 
   // Get cardId from the most recent access or generate a default one
   const getCardId = (): string => {
-    if (accessHistory.length > 0) {
-      // Use the cardId from the most recent access
+    if (accessHistory.length > 0 && accessHistory[0].cardId) {
+      // Use the cardId from the most recent access if it exists
       return accessHistory[0].cardId;
     }
-    // If no access history, generate a default cardId based on user ID
+    // If no access history or cardId is null, generate a default cardId based on user ID
     // In a real app, this should come from the member profile
     return session.user?.id
       ? `CARD-${session.user.id.slice(-8).toUpperCase()}`

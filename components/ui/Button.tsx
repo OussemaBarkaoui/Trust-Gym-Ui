@@ -1,5 +1,6 @@
 import { Colors } from "@/constants/Colors";
 import type { ButtonSize, ButtonVariant } from "@/types/common";
+import { createShadow } from "@/utils/platformStyles";
 import React, { memo, useMemo } from "react";
 import {
   ActivityIndicator,
@@ -101,17 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    ...Platform.select({
-      ios: {
-        shadowColor: Colors.black,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 3,
-      },
-    }),
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.2, 4, 3),
   },
   primary: {
     backgroundColor: Colors.primary,
@@ -124,13 +115,11 @@ const styles = StyleSheet.create({
   },
   text: {
     backgroundColor: "transparent",
-    shadowOpacity: 0,
-    elevation: 0,
+    ...createShadow("#000", { width: 0, height: 0 }, 0, 0, 0),
   },
   textBlack: {
     backgroundColor: "transparent",
-    shadowOpacity: 0,
-    elevation: 0,
+    ...createShadow("#000", { width: 0, height: 0 }, 0, 0, 0),
   },
   black: {
     backgroundColor: "#000000", // Black color
@@ -139,8 +128,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: Colors.primary,
-    shadowOpacity: 0,
-    elevation: 0,
+    ...createShadow("#000", { width: 0, height: 0 }, 0, 0, 0),
   },
   danger: {
     backgroundColor: Colors.error,
@@ -161,14 +149,7 @@ const styles = StyleSheet.create({
   disabled: {
     backgroundColor: Colors.gray400,
     borderColor: Colors.gray400,
-    ...Platform.select({
-      ios: {
-        shadowOpacity: 0,
-      },
-      android: {
-        elevation: 0,
-      },
-    }),
+    ...createShadow("#000", { width: 0, height: 0 }, 0, 0, 0),
   },
   baseText: {
     fontWeight: "600",

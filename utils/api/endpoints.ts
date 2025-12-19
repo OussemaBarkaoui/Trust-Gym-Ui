@@ -33,11 +33,11 @@ export const API_ENDPOINTS = {
   // Subscription endpoints
   SUBSCRIPTIONS: {
     LIST: "/subscriptions",
-    DETAILS: (id: string) => `http://192.168.1.18:3000/subscriptions/${id}`,
+    DETAILS: (id: string) => `http://10.58.235.215:3000/subscriptions/${id}`,
     RENEW: (id: string) =>
-      `http://192.168.1.18:3000/subscriptions/${id}/renew`,
+      `http://10.58.235.215:3000/subscriptions/${id}/renew`,
     UPGRADE: (id: string) =>
-      `http://192.168.1.18:3000/subscriptions/${id}/upgrade`,
+      `http://10.58.235.215:3000/subscriptions/${id}/upgrade`,
   },
 
   // Access endpoints

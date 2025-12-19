@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { createShadow } from "@/utils/platformStyles";
 
 interface InputProps extends TextInputProps {
   error?: string;
@@ -81,14 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#ddd",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    ...createShadow("#000", { width: 0, height: 1 }, 0.1, 2, 2),
   },
   inputContainerError: {
     borderColor: "#FF3B30",

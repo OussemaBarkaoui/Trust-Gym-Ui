@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Colors } from "../../../constants/Colors";
+import { createShadow } from "@/utils/platformStyles";
 
 interface QuickStatsProps {
   checkedInToday: boolean;
@@ -82,14 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 4, 3),
   },
   sectionTitle: {
     fontSize: 18,

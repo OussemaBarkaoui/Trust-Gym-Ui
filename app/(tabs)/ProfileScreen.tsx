@@ -24,7 +24,7 @@ export default function ProfileScreen() {
   const fadeAnim = useFadeIn({ duration: 600, delay: 100 });
   const slideAnim = useSlideIn({ duration: 500, delay: 50 });
   const { session } = useSession();
-  const { confirmLogout } = useLogout();
+  const { confirmLogout, handleLogout } = useLogout();
 
   // Refresh profile data when screen loads
   useEffect(() => {
@@ -144,6 +144,8 @@ export default function ProfileScreen() {
                 <Image
                   source={{ uri: session.user.imageUrl }}
                   style={styles.avatarImage}
+                  onError={(error) => console.log("Image load error:", error.nativeEvent)}
+                  onLoad={() => console.log("Image loaded successfully:", session.user.imageUrl)}
                 />
               ) : (
                 <Text style={styles.avatarText}>{getUserInitials()}</Text>
@@ -194,7 +196,8 @@ export default function ProfileScreen() {
           <View style={styles.logoutSection}>
             <Button
               title="Logout"
-              onPress={confirmLogout}
+              onPress={handleLogout}
+              variant="danger"
               style={styles.logoutButton}
               textStyle={styles.logoutButtonText}
             />

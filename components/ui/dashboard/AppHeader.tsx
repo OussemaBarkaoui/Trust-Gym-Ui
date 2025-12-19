@@ -11,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { Colors } from "../../../constants/Colors";
+import { createShadow } from "@/utils/platformStyles";
 import { useSession } from "../../../contexts/SessionContext";
 import { refreshUserProfileInSession } from "../../../features/profile/api";
 import { useLogout } from "../../../hooks/useLogout";
@@ -141,17 +142,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: Platform.OS === "ios" ? 40 : 50,
     paddingBottom: 20,
-    ...Platform.select({
-      ios: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    ...createShadow("#000", { width: 0, height: 4 }, 0.08, 8, 8),
   },
   headerContent: {
     gap: 16,
@@ -195,14 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 2,
     borderColor: Colors.white,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 4, 3),
     overflow: "hidden",
   },
   avatarImage: {

@@ -88,15 +88,21 @@ export class SessionManager {
         const user = JSON.parse(userProfile);
 
         // Validate parsed user data
+        // Token validation is optional - if it fails, we still allow the session
         if (this.isValidUserProfile(user)) {
-          this.updateSessionState({
-            isAuthenticated: true,
-            user,
-            accessToken,
-            refreshToken,
-            isLoading: false,
-          });
-          return;
+          const isValid = this.isTokenValid(accessToken);
+          
+          // Only reject if token is definitely expired, not on validation errors
+          if (isValid !== false) {
+            this.updateSessionState({
+              isAuthenticated: true,
+              user,
+              accessToken,
+              refreshToken,
+              isLoading: false,
+            });
+            return;
+          }
         }
       }
 
@@ -105,6 +111,34 @@ export class SessionManager {
     } catch (error) {
       console.error("Error initializing session:", error);
       await this.clearInvalidSession();
+    }
+  }
+
+  /**
+   * Validate if token is not expired
+   * Returns true if valid, false if expired, null if unable to validate
+   */
+  private isTokenValid(token: string): boolean | null {
+    try {
+      // Basic JWT parsing
+      const parts = token.split(".");
+      if (parts.length !== 3) {
+        return null; // Invalid JWT format, but don't reject
+      }
+      
+      const payload = JSON.parse(atob(parts[1]));
+      
+      // If no expiration, consider valid
+      if (!payload.exp) {
+        return true;
+      }
+      
+      const expiryTime = payload.exp * 1000; // Convert to milliseconds
+      const currentTime = Date.now();
+      return currentTime < expiryTime;
+    } catch (error) {
+      console.error("Error validating token:", error);
+      return null; // Unable to validate, don't reject
     }
   }
 

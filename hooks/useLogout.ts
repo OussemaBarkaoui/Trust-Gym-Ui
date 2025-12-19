@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import { useSession } from "../contexts/SessionContext";
 import { showError } from "../utils/showMessage";
 
@@ -11,8 +11,18 @@ export const useLogout = () => {
   const handleLogout = useCallback(async () => {
     try {
       await logout();
-      router.replace("/LoginScreen");
+      
+      // Force navigation to login screen
+      router.replace("/(auth)/LoginScreen");
+      
+      // On web, force a reload to ensure clean state
+      if (Platform.OS === "web") {
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 500);
+      }
     } catch (error) {
+      console.error("Logout error:", error);
       showError("Failed to logout. Please try again.");
     }
   }, [logout, router]);

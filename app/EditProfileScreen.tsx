@@ -1,6 +1,7 @@
 import { Button, LabeledInput } from "@/components/ui";
 import { Colors } from "@/constants/Colors";
 import { useEditProfile, useFadeIn, useImagePicker, useSlideIn } from "@/hooks";
+import { createShadow } from "@/utils/platformStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -418,11 +419,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: Colors.gray200,
-    elevation: 2,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
+    ...createShadow(Colors.black, { width: 0, height: 1 }, 0.1, 3, 2),
   },
   headerButton: {
     minWidth: 50,
@@ -459,11 +456,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 12,
     position: "relative",
-    elevation: 3,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.2, 4, 3),
   },
   avatarText: {
     fontSize: 36,
@@ -564,11 +557,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: Colors.gray200,
     backgroundColor: Colors.white,
-    elevation: 5,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    ...createShadow(Colors.black, { width: 0, height: -2 }, 0.1, 4, 5),
   },
   saveButton: {
     marginTop: 0,

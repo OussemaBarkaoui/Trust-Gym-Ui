@@ -330,14 +330,6 @@ const styles = StyleSheet.create({
     padding: 20,
     marginTop: 20,
     marginBottom: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   planInfo: {
     flexDirection: "row",

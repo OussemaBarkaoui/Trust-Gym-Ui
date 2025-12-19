@@ -15,6 +15,7 @@ import {
 import { Colors } from "../constants/Colors";
 import { MemberPurchase } from "../features/purchases/api";
 import { useFadeIn, useMemberPurchases, useSlideIn } from "../hooks";
+import { createShadow } from "../utils/platformStyles";
 
 export default function AllPurchasesScreen() {
   const { purchases, loading, totalItems, refreshPurchases } =
@@ -221,14 +222,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     alignItems: "center",
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
   },
   summaryTitle: {
     fontSize: 14,
@@ -249,14 +242,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
     position: "relative",
   },
   purchaseHeader: {

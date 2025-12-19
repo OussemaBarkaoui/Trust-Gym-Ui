@@ -1,4 +1,5 @@
 import { MemberSubscription } from "@/entities/MemberSubscription";
+import { createShadow } from "@/utils/platformStyles";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useRef } from "react";
@@ -274,14 +275,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 20,
     overflow: "hidden",
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 8,
+    ...createShadow(Colors.black, { width: 0, height: 8 }, 0.15, 16, 8),
   },
   gradientBackground: {
     minHeight: 180,

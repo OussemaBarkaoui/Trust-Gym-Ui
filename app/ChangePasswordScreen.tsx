@@ -16,6 +16,7 @@ import {
 import { Button } from "../components/ui/Button";
 import { Colors } from "../constants/Colors";
 import { useChangePassword, useFadeIn, useSlideIn } from "../hooks";
+import { createShadow } from "../utils/platformStyles";
 
 export default function ChangePasswordScreen() {
   const [oldPassword, setOldPassword] = useState("");
@@ -455,14 +456,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.gray200,
     borderRadius: 16,
     backgroundColor: Colors.white,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 4, 3),
   },
   input: {
     flex: 1,
@@ -481,14 +475,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: Colors.white,
     borderRadius: 16,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 4, 3),
   },
   strengthTitle: {
     fontSize: 14,
@@ -517,14 +504,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 16,
     marginTop: 8,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    ...createShadow(Colors.black, { width: 0, height: 2 }, 0.1, 4, 3),
   },
   requirementsTitle: {
     fontSize: 16,
@@ -560,25 +540,11 @@ const styles = StyleSheet.create({
     padding: 20,
     borderTopWidth: 1,
     borderTopColor: Colors.gray200,
-    shadowColor: Colors.black,
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 10,
+    ...createShadow(Colors.black, { width: 0, height: -2 }, 0.1, 8, 10),
   },
   changeButton: {
     borderRadius: 16,
     paddingVertical: 16,
-    shadowColor: Colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    ...createShadow(Colors.primary, { width: 0, height: 4 }, 0.3, 8, 6),
   },
 });

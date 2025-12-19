@@ -1,6 +1,6 @@
 import { SessionManager } from "@/services/SessionManager";
 
-const API_BASE_URL = "http://192.168.1.18:3000/api/member-purchase";
+const API_BASE_URL = "http://10.58.235.215:3000/api/member-purchase";
 
 // Function to get auth headers
 const getAuthHeaders = () => {
@@ -54,7 +54,11 @@ export const getMemberPurchases =
         headers: getAuthHeaders(),
       });
 
+      console.log("Purchases response status:", response.status);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log("Error response:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
